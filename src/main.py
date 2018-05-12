@@ -2,23 +2,29 @@ import pygame
 
 screen_size = 600
 
-class Game:
+class Graphics:
 	def __init__(self):
 		self.screen = pygame.display.set_mode((screen_size, screen_size))
 		pygame.display.set_caption('Checkers!')
-		self.background = pygame.image.load('img/board.png')
 		self.clock = pygame.time.Clock()
-
+		self.bg = pygame.image.load('img/board.png').convert()
+		self.bg_rect = self.bg.get_rect()
 
 pygame.init()
-game = Game()
+game = Graphics()
+Window = pygame.display.set_mode((screen_size, screen_size))
+pygame.display.set_caption('Checkers!')
+clock = pygame.time.Clock()
 
-endGame = False
-
-while not endGame:
+gameRunning = True
+while gameRunning:
+	Window.fill((255, 255, 255))
+	Window.blit(game.bg, game.bg_rect)
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT:
-			endgame = True
+			gameRunning = False
+
+	pygame.display.flip()
 
 pygame.quit()
 quit()
