@@ -1,9 +1,24 @@
+import pygame
 
-#To jest plik główny projektu, jest tak jakby funkcją main.
+screen_size = 600
 
-def main():
-    print("Hello INPG")
+class Game:
+	def __init__(self):
+		self.screen = pygame.display.set_mode((screen_size, screen_size))
+		pygame.display.set_caption('Checkers!')
+		self.background = pygame.image.load('img/board.png')
+		self.clock = pygame.time.Clock()
 
 
-#uruchamia maina
-main()
+pygame.init()
+game = Game()
+
+endGame = False
+
+while not endGame:
+	for event in pygame.event.get():
+		if event.type == pygame.QUIT:
+			endgame = True
+
+pygame.quit()
+quit()
