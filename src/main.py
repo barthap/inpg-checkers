@@ -11,6 +11,7 @@ BLUE = (0,0,255)
 class Game:
 	def __init__(self):
 		self.graphics = Graphics()
+		self.board = Board()
 
 	def main(self):
 		self.setup()
@@ -27,7 +28,7 @@ class Game:
 		quit()
 
 	def updateGame(self):
-		self.graphics.updateScreen()
+		self.graphics.updateScreen(self.board)
 
 	def gameLoop(self):
 	#główna pętla gry - tutaj się dzieje cała magia
@@ -53,13 +54,54 @@ class Graphics:
 		self.screen.fill((255, 255, 255))
 		self.screen.blit(self.bg, self.bg_rect)
 
-	def updateScreen(self):
+	def updateScreen(self, board):
 		self.generateBg()
 		
 		#tutaj dodawać funkcje rysujące na ekran
 				
 		pygame.display.update()
 		self.clock.tick(self.fps)
+		
+class Board:
+	def __init__(self):
+		self.matrix = self.generateBoard()
+
+	def coordRename(self, coords):
+		return self.matrix[coords[0]][coords[1]]
+
+	def generateBoard(self):
+		boardMatrix = [[None] * 8 for i in range (8)]
+
+		for x in range(8):
+			for y in range(8):
+				if (x % 2 != 0) and (y % 2 == 0):
+					boardMatrix[y][x] = Square(WHITE)
+				elif (x % 2 != 0) and (y % 2 != 0):
+					boardMatrix[y][x] = Square(BLACK)
+				elif (x % 2 == 0) and (y % 2 != 0):
+					boardMatrix[y][x] = Square(WHITE)
+				elif (x % 2 == 0) and (y % 2 == 0):
+					boardMatrix[y][x] = Square(BLACK)
+
+		for x in range(8):
+			for y in range(3):
+				if boardMatrix[x][y].color == BLACK:
+					boardMatrix[x][y].piece = Piece(RED)
+			for y in range(5, 8):
+				if boardMatrix[x][y].color == BLACK:
+					boardMatrix[x][y].piece = Piece(BLUE)
+
+		return boardMatrix
+
+class Piece:
+	def __init__(self, color, king = False):
+		self.color = color
+		self.king = king
+
+class Square:
+	def __init__(self, color, piece = None):
+		self.color = color
+		self.piece = piece
 		
 def main():
 	game = Game()
