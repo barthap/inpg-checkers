@@ -5,9 +5,35 @@ from pygameMenu.locals import *  # Import constants (like actions)
 from constants import *
 from scene import BaseScene
 from game import GameScene
-
+import pygameMenu.config_textmenu as _cfg
 
 # Main Menu scene
+class supermenu(pygameMenu.TextMenu):
+	def __init__(self,
+                 surface,
+                 window_width,
+                 window_height,
+                 font,
+                 title,
+                 draw_text_region_x=_cfg.TEXT_DRAW_X,
+                 text_centered=_cfg.TEXT_CENTERED,
+                 text_color=_cfg.TEXT_FONT_COLOR,
+                 text_fontsize=_cfg.MENU_FONT_TEXT_SIZE,
+                 text_margin=_cfg.TEXT_MARGIN,
+                 **kwargs):
+		super(supermenu,self).__init__(
+                surface,
+                window_width,
+                window_height,
+                font,
+                title,
+                draw_text_region_x,
+                text_centered,
+                text_color,
+                text_fontsize,
+                text_margin,
+				** kwargs)
+
 class MenuScene(BaseScene):
     def __init__(self, app):
         super().__init__(app)
@@ -18,7 +44,7 @@ class MenuScene(BaseScene):
                                title='Menu Gry', bgfun=None, dopause=False)
 
         # Show the rules
-        self.help_menu = pygameMenu.TextMenu(app.graphics.screen, window_width=SCREEN_SIZE, window_height=SCREEN_SIZE,
+        self.help_menu = supermenu(app.graphics.screen, window_width=SCREEN_SIZE, window_height=SCREEN_SIZE,
                                         font=pygameMenu.fonts.FONT_FRANCHISE,
                                         onclose=PYGAME_MENU_DISABLE_CLOSE,
                                         title='Help', dopause=False,
@@ -32,10 +58,7 @@ class MenuScene(BaseScene):
         self.menu.add_option('Rules', self.help_menu)
         self.menu.add_option('Exit', self.app.exit)  # Add exit function
 
-        HELP = ['To jest w pliku menu.py',
-                'TODO: Dodac tu zasady z Rules.txt',
-                'I jakies instrukcje poruszania sie',
-                'Np kliknij myszka na pionek, potem na pole']
+        HELP = open("resources/rules.txt","r")
 
         for line in HELP:
             self.help_menu.add_line(line)  # Add line
