@@ -39,12 +39,12 @@ class MenuScene(BaseScene):
         super().__init__(app)
 
         # Main Menu
-        self.menu = pygameMenu.Menu(app.graphics.screen, window_width=SCREEN_SIZE, window_height=SCREEN_SIZE,
+        self.menu = pygameMenu.Menu(app.graphics.screen, window_width=SCREEN_WIDTH, window_height=SCREEN_HEIGHT,
                                font=pygameMenu.fonts.FONT_NEVIS,
                                title='Menu Gry', bgfun=None, dopause=False)
 
         # Show the rules
-        self.help_menu = supermenu(app.graphics.screen, window_width=SCREEN_SIZE, window_height=SCREEN_SIZE,
+        self.help_menu = supermenu(app.graphics.screen, window_width=SCREEN_WIDTH, window_height=SCREEN_HEIGHT,
                                         font=pygameMenu.fonts.FONT_FRANCHISE,
                                         onclose=PYGAME_MENU_DISABLE_CLOSE,
                                         title='Help', dopause=False,

@@ -4,14 +4,17 @@
 
 # App general config
 WINDOW_TITLE: str = "Checkers !"
-SCREEN_SIZE = 600   # Window width and height
+
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 600
 
 # Filesystem utility constants
 RESOURCE_PATH = "resources"     # relative path to resource folder
 IMAGE_PATH = "img"              # image folder name (inside resources)
 
 # Constants used in gameplay
-SQUARE_SIZE = int(SCREEN_SIZE / 8)
+BOARD_SIZE = 600   # Window width and height
+SQUARE_SIZE = int(BOARD_SIZE / 8)
 PIECE_SIZE = int(SQUARE_SIZE / 2)
 
 # Color definitions

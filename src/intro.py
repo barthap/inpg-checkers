@@ -11,7 +11,7 @@ class IntroScene(BaseScene):
     def __init__(self, app):
         super().__init__(app)
         self.img = app.resource_manager.get_image('intro.jpg')
-        self.img = pygame.transform.scale(self.img, (SCREEN_SIZE, SCREEN_SIZE))
+        self.img = pygame.transform.scale(self.img, (SCREEN_WIDTH, SCREEN_HEIGHT))
         self.img_rect = self.img.get_rect()
 
     def setup(self):
@@ -22,8 +22,8 @@ class IntroScene(BaseScene):
         text = font.render("Wciśnij Enter lub Spację, aby rozpocząć", True, (0, 255, 0))
 
         # Set text coordinates
-        text_x = SCREEN_SIZE / 2 - text.get_width() // 2
-        text_y = SCREEN_SIZE / 4 - text.get_height() // 2
+        text_x = SCREEN_WIDTH / 2 - text.get_width() // 2
+        text_y = SCREEN_HEIGHT / 4 - text.get_height() // 2
 
         self.app.graphics.draw(text, (text_x, text_y))
 
