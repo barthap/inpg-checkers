@@ -59,17 +59,17 @@ def whatPixel(board_coords):
 
 
 def whatSquare(pixel_coord):
-    return int(pixel_coord[0] / SQUARE_SIZE), int(pixel_coord[2] / SQUARE_SIZE)
+    return int(pixel_coord[0] / SQUARE_SIZE), int(pixel_coord[1] / SQUARE_SIZE)
 
 
 class Board:
     def __init__(self):
-        self.matrix = self.generateBoard()
+        self.matrix = self.generateBoardMatrix()
 
     def coordRename(self, coords):
         return self.matrix[coords[0]][coords[1]]
 
-    def generateBoard(self):
+    def generateBoardMatrix(self):
         boardMatrix = [[None] * 8 for i in range(8)]
 
         for x in range(8):
@@ -83,6 +83,7 @@ class Board:
                 elif (x % 2 == 0) and (y % 2 == 0):
                     boardMatrix[y][x] = Square(BLACK)
 
+#tutaj zmieniać, jeżeli w opcjach zostanie zmieniony wariant gry pomięddzy 2-3 rzędy
         for x in range(8):
             for y in range(3):
                 if boardMatrix[x][y].color == BLACK:

@@ -28,10 +28,12 @@ class MenuScene(BaseScene):
     def setup(self):
         self.app.graphics.clear_screen()
 
-        self.menu.add_option('Play', self.__go_play)  # Add timer submenu
+        self.menu.add_option('Play', self.__go_play)  #TODO: Add timer submenu
         self.menu.add_option('Rules', self.help_menu)
-        self.menu.add_option('Exit', self.app.exit)  # Add exit function
+        self.menu.add_option('Exit', self.app.exit)
 
+
+		#TODO: Help menu
         HELP = ['To jest w pliku menu.py',
                 'TODO: Dodac tu zasady z Rules.txt',
                 'I jakies instrukcje poruszania sie',
