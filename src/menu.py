@@ -5,6 +5,7 @@ from pygameMenu.locals import *  # Import constants (like actions)
 from constants import *
 from scene import BaseScene
 from game import GameScene
+import pygame.gfxdraw as _gfxdraw
 import pygameMenu.config_textmenu as _cfg
 
 # Main Menu scene
@@ -18,7 +19,7 @@ class supermenu(pygameMenu.TextMenu):
                  draw_text_region_x=_cfg.TEXT_DRAW_X,
                  text_centered=_cfg.TEXT_CENTERED,
                  text_color=_cfg.TEXT_FONT_COLOR,
-                 text_fontsize=_cfg.MENU_FONT_TEXT_SIZE,
+                 text_fontsize= 20,
                  text_margin=_cfg.TEXT_MARGIN,
                  **kwargs):
 		super(supermenu,self).__init__(
@@ -33,6 +34,161 @@ class supermenu(pygameMenu.TextMenu):
                 text_fontsize,
                 text_margin,
 				** kwargs)
+		self.pages_count = 0
+		self.actual_page = 0
+		text = self._actual._fonttext.render("A", 1,self._actual._font_textcolor)
+		text_width_char = text.get_size()[0];
+		text_height_char = text.get_size()[1];
+		self.char_per_line = (self._width - 2* text_margin) // (text_width_char)
+		self.lines_per_page = (self._height - 2 * text_margin) // (text_height_char)
+
+	def draw(self):
+		assert isinstance(self._actual, supermenu)
+
+		# Draw background rectangle
+		_gfxdraw.filled_polygon(self._surface, self._actual._bgrect,
+		                        self._actual._bgcolor)
+		# Draw title
+		_gfxdraw.filled_polygon(self._surface, self._actual._title_rect,
+		                        self._bg_color_title)
+		self._surface.blit(self._actual._title, self._title_pos)
+
+		# Draw text
+		dy = 0
+		for linea in self._actual._text:
+			text = self._actual._fonttext.render(linea, 1,
+			                                     self._actual._font_textcolor)
+			text_width = text.get_size()[0]
+			text_dx = 0
+			ycoords =  self._actual._title_rect[4][0]+self._actual._textdy + dy * (
+					self._actual._font_textsize + self._actual._textdy)
+			ycoords -= self._actual._font_textsize / 2
+			self._surface.blit(text, (self._actual._pos_text_x + text_dx,
+			                          ycoords))
+			dy += 1*0.8
+		# dysum = dy * (self._actual._font_textsize + self._actual._textdy)
+		# dysum += 2 * self._actual._textdy + self._actual._font_textsize
+
+		dy = 0
+		dy_index = 0
+		for option in self._actual._option:
+			# If option is selector
+			if option[0] == _locals.PYGAMEMENU_TYPE_SELECTOR:
+				# If selected index then change color
+				if dy == self._actual._index:
+					text = self._actual._font.render(option[1].get(), 1,
+					                                 self._actual._sel_color)
+					text_bg = self._actual._font.render(option[1].get(), 1,
+					                                    _cfg_menu.SHADOW_COLOR)
+				else:
+					text = self._actual._font.render(option[1].get(), 1,
+					                                 self._actual._font_color)
+					text_bg = self._actual._font.render(option[1].get(), 1,
+					                                    _cfg_menu.SHADOW_COLOR)
+			else:
+				# If selected index then change color
+				if dy == self._actual._index:
+					text = self._actual._font.render(option[0], 1,
+					                                 self._actual._sel_color)
+					text_bg = self._actual._font.render(option[0], 1,
+					                                    _cfg_menu.SHADOW_COLOR)
+				else:
+					text = self._actual._font.render(option[0], 1,
+					                                 self._actual._font_color)
+					text_bg = self._actual._font.render(option[0], 1,
+					                                    _cfg_menu.SHADOW_COLOR)
+			# Text font and size
+			text_width, text_height = text.get_size()
+			if self._actual._centered_option:
+				text_dx = -int(text_width / 2.0)
+				t_dy = -int(text_height / 2.0)
+			else:
+				text_dx = 0
+				t_dy = 0
+			# Draw fonts
+			if self._actual._option_shadow:
+				ycoords = self._actual._opt_posy + dy * (
+						self._actual._fsize + self._actual._opt_dy) + t_dy - 3
+				self._surface.blit(text_bg,
+				                   (self._actual._opt_posx + text_dx - 3,
+				                    ycoords + dysum))
+			ycoords = self._actual._opt_posy + dy * (
+					self._actual._fsize + self._actual._opt_dy) + t_dy
+			self._surface.blit(text, (self._actual._opt_posx + text_dx,
+			                          ycoords + dysum))
+			# If selected option draw a rectangle
+			if self._actual._drawselrect and (dy_index == self._actual._index):
+				if not self._actual._centered_option:
+					text_dx_tl = -text_width
+				else:
+					text_dx_tl = text_dx
+				ycoords = self._actual._opt_posy + dy * (
+						self._actual._fsize + self._actual._opt_dy) + t_dy - 2
+				_pygame.draw.line(self._surface, self._actual._sel_color, (
+					self._actual._opt_posx + text_dx - 10,
+					self._actual._opt_posy + dysum + dy * (
+							self._actual._fsize + self._actual._opt_dy) + t_dy - 2),
+				                  ((self._actual._opt_posx - text_dx_tl + 10,
+				                    ycoords + dysum)), self._actual._rect_width)
+				ycoords = self._actual._opt_posy + dy * (
+						self._actual._fsize + self._actual._opt_dy) - t_dy + 2
+				_pygame.draw.line(self._surface, self._actual._sel_color, (
+					self._actual._opt_posx + text_dx - 10,
+					self._actual._opt_posy + dysum + dy * (
+							self._actual._fsize + self._actual._opt_dy) - t_dy + 2),
+				                  ((self._actual._opt_posx - text_dx_tl + 10,
+				                    ycoords + dysum)), self._actual._rect_width)
+				ycoords = self._actual._opt_posy + dy * (
+						self._actual._fsize + self._opt_dy) - t_dy + 2
+				_pygame.draw.line(self._surface, self._actual._sel_color, (
+					self._actual._opt_posx + text_dx - 10,
+					self._actual._opt_posy + dysum + dy * (
+							self._actual._fsize + self._actual._opt_dy) + t_dy - 2),
+				                  ((self._actual._opt_posx + text_dx - 10,
+				                    ycoords + dysum)), self._actual._rect_width)
+				ycoords = self._actual._opt_posy + dy * (
+						self._actual._fsize + self._actual._opt_dy) - t_dy + 2
+				_pygame.draw.line(self._surface, self._actual._sel_color, (
+					self._actual._opt_posx - text_dx_tl + 10,
+					self._actual._opt_posy + dysum + dy * (
+							self._actual._fsize + self._actual._opt_dy) + t_dy - 2),
+				                  ((self._actual._opt_posx - text_dx_tl + 10,
+				                    ycoords + dysum)), self._actual._rect_width)
+			dy += 1
+			dy_index += 1
+
+	def add_line(self, text):
+		text = text.strip()
+		if len(text) > self.char_per_line:
+			sliced_text_1 = text[:self.char_per_line]
+			sliced_text_2 = text[self.char_per_line:]
+
+			if(sliced_text_1[-1].isalpha()):
+				sliced_text_2=sliced_text_1[-1]+sliced_text_2
+				sliced_text_1=sliced_text_1[:-1]+'-'
+			self._text.append(sliced_text_1)
+			self.add_line(sliced_text_2)
+		else:
+			self._text.append(text)
+		self.pages_count = len(self._text) // self.lines_per_page
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 class MenuScene(BaseScene):
     def __init__(self, app):
@@ -40,11 +196,13 @@ class MenuScene(BaseScene):
 
         # Main Menu
         self.menu = pygameMenu.Menu(app.graphics.screen, window_width=SCREEN_WIDTH, window_height=SCREEN_HEIGHT,
-                               font=pygameMenu.fonts.FONT_NEVIS,
-                               title='Menu Gry', bgfun=None, dopause=False)
+                                menu_width=SCREEN_WIDTH, menu_height=SCREEN_HEIGHT,
+                                font=pygameMenu.fonts.FONT_NEVIS,
+                                title='Menu Gry', bgfun=None, dopause=False)
 
         # Show the rules
         self.help_menu = supermenu(app.graphics.screen, window_width=SCREEN_WIDTH, window_height=SCREEN_HEIGHT,
+                                        menu_width=SCREEN_WIDTH, menu_height=SCREEN_HEIGHT,
                                         font=pygameMenu.fonts.FONT_FRANCHISE,
                                         onclose=PYGAME_MENU_DISABLE_CLOSE,
                                         title='Help', dopause=False,
@@ -62,7 +220,7 @@ class MenuScene(BaseScene):
 
         for line in HELP:
             self.help_menu.add_line(line)  # Add line
-        self.help_menu.add_option('Return to Menu', PYGAME_MENU_BACK)  # Add option
+        #self.help_menu.add_option('Return to Menu', PYGAME_MENU_BACK)  # Add option
 
     def update(self, events):
         self.menu.mainloop(events)
