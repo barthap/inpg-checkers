@@ -19,7 +19,7 @@ class IntroScene(BaseScene):
         self.app.graphics.draw(self.img, self.img_rect)
 
         font = pygame.font.SysFont("comicsansms", 24)
-        text = font.render("Wciśnij Enter lub Spację, aby rozpocząć", True, (0, 255, 0))
+        text = font.render("Wciśnij Enter lub Spację, aby rozpocząć", True, GREEN)
 
         # Set text coordinates
         text_x = SCREEN_SIZE / 2 - text.get_width() // 2
