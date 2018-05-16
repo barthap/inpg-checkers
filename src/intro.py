@@ -2,7 +2,7 @@ import pygame
 
 from constants import *
 from scene import BaseScene
-from game import GameScene
+from menu import MenuScene
 
 
 # Scene for showing intro
@@ -30,4 +30,4 @@ class IntroScene(BaseScene):
     def update(self, events):
         for event in events:
             if event.type == pygame.KEYDOWN and (event.key == pygame.K_RETURN or event.key == pygame.K_SPACE):
-                self.app.switch_state(GameScene(self.app))
+                self.app.switch_state(MenuScene(self.app))
