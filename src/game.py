@@ -4,6 +4,8 @@ from resources import ResourceManager
 from scene import BaseScene
 from constants import *
 from graphics import Graphics
+#pause
+from pause import PauseScene
 
 
 # Main Game code
@@ -18,6 +20,10 @@ class GameScene(BaseScene):
 
     def update(self, events):
         self.renderer.render_screen(self.board)
+        #pause
+        for event in events:
+            if event.type == pygame.KEYDOWN and (event.key == pygame.K_SPACE or event.key == pygame.K_ESCAPE):
+                self.app.switch_state(PauseScene(self.app,self))
 
 
 class GameRenderer:

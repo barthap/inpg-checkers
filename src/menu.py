@@ -172,24 +172,6 @@ class supermenu(pygameMenu.TextMenu):
 			self._text.append(text)
 		self.pages_count = len(self._text) // self.lines_per_page
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 class MenuScene(BaseScene):
     def __init__(self, app):
         super().__init__(app)
