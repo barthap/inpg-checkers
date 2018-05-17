@@ -37,6 +37,7 @@ class App:
 
     # Init the app
     def __setup(self):
+        print("Starting game...")
         self.graphics.setup_window()
         self.state.setup()
 
@@ -55,6 +56,7 @@ class App:
 
     # Called when user exits game
     def __quit(self):
+        print("Game finished, closing")
         pygame.quit()
         quit()
 
