@@ -47,14 +47,26 @@ class GameScene(BaseScene):
 			if mouse_square == self.selected_square:
 				self.deselect_piece()
 
-			# TODO: force hop if any piece can do it
-
 			if mouse_square.color is BLACK and mouse_square.piece is None:
 				if mouse_square.location in self.board.legal_moves(self.selected_square.location):
+					if self.can_hop():  # Hop an enemy
+						enemy_pos = self.board.position_between(self.selected_square.location, mouse_square.location)
+						enemy_piece = self.board.matrix_coords(enemy_pos).piece
+						print("HOPPED AN ENEMY!")
+						self.board.remove_piece(enemy_piece)
 					mouse_square.piece = self.selected_square.piece
 					self.board.remove_piece(self.selected_square)
 					self.deselect_piece()
 					self.switch_turn()
+
+	def can_hop(self):
+		if self.selected_square is None:
+			return False
+		adj = self.board.adjacent_tiles(self.selected_square.location)
+		for move in self.board.legal_moves(self.selected_square.location):
+			if move not in adj:
+				return True
+		return False
 
 	def switch_turn(self):
 		self.turn = BLUE if self.turn is RED else RED  # if red then blue, else RED xD
@@ -176,22 +188,34 @@ class Board:
 			for y in range(8):
 				self.matrix[x][y].highlighted = False
 
-	def squares_in_dir(self, position: Coords, direction, number: int) -> Coords:
+	# Used for finding enemy position when hopping
+	@staticmethod
+	def position_between(pos_a: Coords, pos_b: Coords):
+		enemy_pos_x = int(pos_a[0] + (pos_b[0] - pos_a[0]) / 2)
+		enemy_pos_y = int(pos_a[1] + (pos_b[1] - pos_a[1]) / 2)
+		enemy_pos = (enemy_pos_x, enemy_pos_y)
+		return enemy_pos
+
+	# Returns coordinates of tile relative ('number' fields away) to a position in specified direction
+	# DOES NOT CHECK IF ON BOARD!
+	def squares_in_dir(self, position: Coords, direction, number: int=1) -> Coords:
 		(x, y) = position
-		if direction == NW and self.is_on_board((x - number, y - number)):
+		if direction == NW:
 			return x - number, y - number
-		if direction == NE and self.is_on_board((x + number, y - number)):
+		if direction == NE:
 			return x + number, y - number
-		if direction == SE and self.is_on_board((x + number, y + number)):
+		if direction == SE:
 			return x + number, y + number
-		if direction == SW and self.is_on_board((x - number, y + number)):
+		if direction == SW:
 			return x - number, y + number
 
+	# Returns coordinates of all tiles adjacent to specified position
+	# DOES NOT CHECK IF ON BOARD!
 	def adjacent_tiles(self, pos: Coords) -> List[Coords]:
-		return [self.squares_in_dir(pos, NE, 1),
-		        self.squares_in_dir(pos, NW, 1),
-		        self.squares_in_dir(pos, SE, 1),
-		        self.squares_in_dir(pos, SW, 1)]
+		return [self.squares_in_dir(pos, NE),
+		        self.squares_in_dir(pos, NW),
+		        self.squares_in_dir(pos, SE),
+		        self.squares_in_dir(pos, SW)]
 
 	@staticmethod
 	def is_on_board(coords: Coords) -> bool:
@@ -207,23 +231,30 @@ class Board:
 		if piece is not None:
 			if piece.king is False:
 				if piece.color is BLUE:
-					if self.matrix_coords(self.squares_in_dir(coords, NW, 1)).piece is None:
-						normal_legal_moves.append(self.squares_in_dir(coords, NW, 1))
-					if self.matrix_coords(self.squares_in_dir(coords, NE, 1)).piece is None:
-						normal_legal_moves.append(self.squares_in_dir(coords, NE, 1))
+					nw_dir = self.squares_in_dir(coords, NW, 1)
+					if self.is_on_board(nw_dir) and self.matrix_coords(nw_dir).piece is None:
+						normal_legal_moves.append(nw_dir)
+
+					ne_dir = self.squares_in_dir(coords, NE, 1)
+					if self.is_on_board(ne_dir) and self.matrix_coords(ne_dir).piece is None:
+						normal_legal_moves.append(ne_dir)
 				elif piece.color is RED:
-					if self.matrix_coords(self.squares_in_dir(coords, SW, 1)).piece is None:
-						normal_legal_moves.append(self.squares_in_dir(coords, SW, 1))
-					if self.matrix_coords(self.squares_in_dir(coords, SE, 1)).piece is None:
-						normal_legal_moves.append(self.squares_in_dir(coords, SE, 1))
+					sw_dir = self.squares_in_dir(coords, SW, 1)
+					if self.is_on_board(sw_dir) and self.matrix_coords(sw_dir).piece is None:
+						normal_legal_moves.append(sw_dir)
+
+					se_dir = self.squares_in_dir(coords, SE, 1)
+					if self.is_on_board(se_dir) and self.matrix_coords(se_dir).piece is None:
+						normal_legal_moves.append(se_dir)
 
 		return normal_legal_moves
 
-	# TODO: highlight legal moves
 	def legal_moves(self, coords: Coords) -> List[Coords]:
 		legal_moves = list()
 		legal_moves.extend(self.move_possible_squares(coords))
-		legal_moves.extend(self.hop_possible_squares(coords))
+		hop_moves = self.hop_possible_squares(coords)
+		if len(hop_moves) > 0:
+			legal_moves = hop_moves
 
 		return legal_moves
 
