@@ -202,7 +202,7 @@ class MenuScene(BaseScene):
 
         for line in HELP:
             self.help_menu.add_line(line)  # Add line
-        #self.help_menu.add_option('Return to Menu', PYGAME_MENU_BACK)  # Add option
+        #self.help_menu.add_option('Return to Menu', self.menu)  # Add option
 
     def update(self, events):
         self.menu.mainloop(events)
