@@ -1,0 +1,20 @@
+#!/bin/bash
+pyv=$( python -c 'import sys; print(sys.version_info[0])' )
+
+if [ $pyv = '3' ]
+then
+	echo "Running python game: python src/main.py"
+	python src/main.py
+else
+	echo "Python version not valid. Trying python3"
+	py3=$( python3 -c 'import sys; print(sys.version_info[0])' )
+	if [ $py3 = '3' ]
+	then
+		echo "Running python3 src/main.py"
+		python3 src/main.py
+	else
+		echo $py3
+		echo "No valid python found. Exiting..."
+	fi
+fi
+
