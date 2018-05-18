@@ -31,8 +31,8 @@ class SceneManager:
 	def setup(self, initial: str):
 		self.go(initial)
 
-	def get_scene_object(self, scene_name: str) -> BaseScene:
-		if scene_name in self._scenes.keys():
+	def get_scene_object(self, scene_name: str, reload=False) -> BaseScene:
+		if scene_name in self._scenes.keys() and not reload:
 			scene = self._scenes[scene_name]
 
 		else:
@@ -40,6 +40,7 @@ class SceneManager:
 			if scene_class is None:
 				raise RuntimeError("Couldn't load scene " + scene_name)
 			scene = scene_class(self.app)
+			self._scenes[scene_name] = scene
 			print("Loaded", scene_class.__name__)
 
 		return scene
