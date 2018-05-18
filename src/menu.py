@@ -68,4 +68,4 @@ class MenuScene(BaseScene):
         self.menu.mainloop(events)
 
     def __go_play(self):
-        self.app.switch_state(GameScene(self.app))
+        self.app.switch_scene(GAME)

@@ -30,3 +30,10 @@ NW = 'northwest'
 NE = 'northeast'
 SE = 'southeast'
 SW = 'southwest'
+
+# Scene names
+# SCENE = 'filename.ClassName'
+INTRO = 'intro.IntroScene'
+MENU = 'menu.MenuScene'
+GAME = 'game.GameScene'
+PAUSE = 'PUT NAME HERE'

@@ -30,4 +30,4 @@ class IntroScene(BaseScene):
     def update(self, events):
         for event in events:
             if event.type == pygame.KEYDOWN and (event.key == pygame.K_RETURN or event.key == pygame.K_SPACE):
-                self.app.switch_state(MenuScene(self.app))
+                self.app.switch_scene(MENU)
