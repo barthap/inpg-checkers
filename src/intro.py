@@ -2,7 +2,6 @@ import pygame
 
 from constants import *
 from scene import BaseScene
-from menu import MenuScene
 
 
 # Scene for showing intro
