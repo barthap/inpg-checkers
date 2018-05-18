@@ -61,7 +61,6 @@ class GameScene(BaseScene):
 					self.select_piece()
 				else:
 					self.move_piece()
-
 		self.renderer.render_screen(self.board)
 
 	def mouse_in_what_square(self):
@@ -201,6 +200,8 @@ class Board:
 
 		return normal_legal_moves
 
+
+#TODO: highlight legal moves
 	def legal_moves(self, coords):
 		legal_moves = list()
 		legal_moves.extend(self.move_possible_squares(coords))
