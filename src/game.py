@@ -60,7 +60,8 @@ class GameScene(BaseScene):
     def move_piece(self):
         mouse_square = self.mouse_in_what_square()
         if self.selected_square is not None:
-            if mouse_square == self.selected_square and not self.can_hop() and not self.hopped:
+            if mouse_square == self.selected_square:
+                # and not self.can_hop() and not self.hopped:
                 print('same, deselecting')
                 self.deselect_piece()
 
@@ -75,7 +76,12 @@ class GameScene(BaseScene):
                         self.board.remove_all_highlights()      # Remove old highlights
                         mouse_square.piece = self.selected_square.piece
                         self.board.remove_piece(self.selected_square)
-                        self.update_selected(mouse_square, True)      # Piece is selected at its new position
+                        self.update_selected(mouse_square, False)
+                        #Piece is selected at its new position
+                        if not self.can_hop():
+                            self.deselect_piece()
+                            self.switch_turn()
+                            self.hopped = False
                     else:
                         mouse_square.piece = self.selected_square.piece
                         self.board.remove_piece(self.selected_square)
@@ -120,6 +126,7 @@ class GameScene(BaseScene):
                     self.select_piece()
                 else:
                     self.move_piece()
+        self.board.knight_possible()
         self.renderer.render_screen(self.board)
 
     def mouse_in_what_square(self) -> 'Square':
@@ -315,6 +322,17 @@ class Board:
                                 hop_moves.append(pos_behind)
         return hop_moves
 
+
+    def knight_possible(self):
+        for x in range(8):
+            for y in range(7,8):
+                piece: Piece = self.matrix_coords((x, y)).piece
+                if piece is not None and piece.color == RED:
+                    piece.king = True
+            for y in range (1):
+                piece: Piece = self.matrix_coords((x, y)).piece
+                if piece is not None and piece.color == BLUE:
+                    piece.king = True
 
 class Square:
     def __init__(self, color: Color, location: Coords, piece=None):
