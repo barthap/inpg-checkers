@@ -3,7 +3,7 @@
 # Base class for game scene (Intro, Menu, Game etc.). All states should derive from it
 # TODO: Make it abstract
 class BaseScene:
-    def __init__(self, app):
+    def __init__(self, app: 'App'):
         self.app = app
 
     def setup(self):

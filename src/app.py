@@ -1,8 +1,11 @@
+from typing import Type
+
 import pygame
 
 from graphics import Graphics
 from intro import IntroScene
 from resources import ResourceManager
+import scene
 
 
 # Main App class, initializes game, runs main loops, handles events etc
@@ -11,7 +14,7 @@ class App:
         self.graphics = Graphics()              # PyGame rendering/graphic utils
         self.resource_manager = ResourceManager()
         self.__running = True                   # Flag determines if main loop should still run
-        self.state = IntroScene(self)           # Loads state machine
+        self.state: scene.BaseScene = IntroScene(self)           # Loads state machine
 
     # Main function, it is ran in main.py
     def main(self):
@@ -28,7 +31,7 @@ class App:
         self.__running = False   # Break main loop
 
     # Function to change states, etc Intro -> Menu, Menu -> Game etc.
-    def switch_state(self, new_state):
+    def switch_state(self, new_state: scene.BaseScene):
         self.state.destroy()
         self.state = new_state
         self.state.setup()
