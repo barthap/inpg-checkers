@@ -32,11 +32,12 @@ class GameScene(BaseScene):
 			self.selected_square.highlighted = True
 			print("selected", self.selected_square.location)
 			print('legal:')
-			for items in self.board.legal_moves(self.selected_square.location):
-				print(items)
+			for location in self.board.legal_moves(self.selected_square.location):
+				print(location)
+				self.board.matrix_coords(location).highlighted = True
 
 	def deselect_piece(self):
-		self.selected_square.highlighted = False
+		self.board.remove_all_highlights()
 		self.selected_square = None
 		print("unselected")
 
@@ -169,6 +170,11 @@ class Board:
 					board_matrix[x][y].piece = Piece(BLUE)
 
 		return board_matrix
+
+	def remove_all_highlights(self) -> None:
+		for x in range(8):
+			for y in range(8):
+				self.matrix[x][y].highlighted = False
 
 	def squares_in_dir(self, position: Coords, direction, number: int) -> Coords:
 		(x, y) = position
