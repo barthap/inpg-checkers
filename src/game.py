@@ -247,7 +247,7 @@ class Board:
 	def matrix_coords(self, coords: Coords) -> 'Square':
 		(x, y) = coords
 		if not self.is_on_board(coords):
-			raise IndexError("Coords are out of range")
+			raise IndexError("Coords " + str(coords) + " are outside of board")
 
 		return self.matrix[x][y]
 
@@ -382,11 +382,13 @@ class Board:
 		(x, y) = coords
 		for direction in [NW, SW, NE, SE]:
 			for number in range(8):
-				tile: Square = self.squares_in_dir(coords, direction, number)
+				tile: Square = self.matrix_coords(self.squares_in_dir(coords, direction, number))
 				if self.is_on_board(tile.location):
-					next_tile: Square = self.squares_in_dir(tile.location, direction, 1)
-					if (self.is_on_board(next_tile.location) and next_tile.piece is not None) or \
-							(self.is_on_board(next_tile.location) is False):
+					next_tile_pos = self.squares_in_dir(tile.location, direction, 1)
+					next_tile_on_board = self.is_on_board(next_tile_pos)
+					next_tile_has_piece = (next_tile_on_board and self.matrix_coords(next_tile_pos).piece is not None)
+					if (next_tile_on_board is True and next_tile_has_piece is True) or \
+							(next_tile_on_board is False):
 						possible_squares.append(coords)
 						break
 		return possible_squares
@@ -415,14 +417,17 @@ class Board:
 					for number in range(8):
 						tile: (x,y) = self.squares_in_dir(coords, direction, number)
 						if self.is_on_board(tile):
-							next_tile: Square = self.matrix_coords(self.squares_in_dir(tile, direction, 1))
-							if self.is_on_board(
-									next_tile.location) and next_tile.piece is not None and next_tile.piece.color == piece.color:
-								for arg in range(8):
-									tile_after: Square = self.squares_in_dir(next_tile.location, direction,
-																			 number + arg)
-									if self.is_on_board(tile_after.location) and tile_after.piece is None:
-										hop_moves.append(next_tile.location)
+							next_tile_pos = self.squares_in_dir(tile, direction, 1)
+							if self.is_on_board(next_tile_pos):
+								next_tile: Square = self.matrix_coords(next_tile_pos)
+								if next_tile.piece is not None and next_tile.piece.color == piece.color:
+									for arg in range(8):
+										tile_after_pos = self.squares_in_dir(next_tile.location, direction,
+																				number + arg)
+										if self.is_on_board(tile_after_pos):
+											tile_after: Square = self.matrix_coords(tile_after_pos)
+											if tile_after.piece is None:
+												hop_moves.append(next_tile)
 
 		return hop_moves
 
