@@ -44,6 +44,7 @@ class supermenu(pygameMenu.TextMenu):
 		text_width_char = text.get_size()[0];
 		text_height_char = self._actual._font_textsize
 		self.char_per_line = (self._width) // (text_width_char)
+		self.text_width_char = text_width_char
 		self.lines_per_page = (self._height - math.ceil(
 			self._actual._title_rect[4][1]) - 2 * text_margin - button_region_y) // (text_height_char)
 		self.button_region_y = button_region_y
@@ -68,7 +69,6 @@ class supermenu(pygameMenu.TextMenu):
 		             self.actual_page * self.lines_per_page:(self.actual_page + 1) * self.lines_per_page]:
 			text = self._actual._fonttext.render(linea, 1,
 			                                     self._actual._font_textcolor)
-			text_width = text.get_size()[0]
 
 			ycoords = self._actual._title_rect[4][1] + self._actual._textdy + dy * (
 				self._actual._font_textsize)
@@ -77,6 +77,21 @@ class supermenu(pygameMenu.TextMenu):
 			dy += 1
 
 		dysum = 0.5 * self.lines_per_page * (self._actual._font_textsize)
+
+		if(self.actual_page>0):
+			instruction1 = "<- previous"
+			text = self._actual._fonttext.render(instruction1, 1,self._actual._font_textcolor)
+			self._surface.blit(text, (self._actual._pos_text_x + 40, ((self._height - (self.lines_per_page
+			        * self._actual._font_textsize + self._actual._title_rect[4][1]))/2) - self._actual._font_textsize
+			        + (self.lines_per_page * self._actual._font_textsize + self._actual._title_rect[4][1])))
+
+		if(self.actual_page<self.pages_count-1):
+			instruction2 = "next ->"
+			text = self._actual._fonttext.render(instruction2, 1,self._actual._font_textcolor)
+			self._surface.blit(text, (self._width-self._actual._pos_text_x - 40 - self.text_width_char
+			        * len(instruction2),((self._height- (self.lines_per_page
+			        * self._actual._font_textsize + self._actual._title_rect[4][1]))/2) - self._actual._font_textsize
+			        + (self.lines_per_page * self._actual._font_textsize + self._actual._title_rect[4][1])))
 
 		dy = 0
 		dy_index = 0
