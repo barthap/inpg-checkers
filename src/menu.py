@@ -42,7 +42,7 @@ class supermenu(pygameMenu.TextMenu):
 		self.pages_count = 0
 		self.actual_page = 0
 		text = self._actual._fonttext.render("A", 1, self._actual._font_textcolor)
-		text_width_char = text.get_size()[0];
+		text_width_char = text.get_size()[0]
 		text_height_char = self._actual._font_textsize
 		self.char_per_line = (self._width) // (text_width_char)
 		self.text_width_char = text_width_char
@@ -251,11 +251,9 @@ class MenuScene(BaseScene):
 
 		HELP.close()
 
-
 	def update(self, events):
 		self.menu.mainloop(events)
 		self.help_menu.main1(events)
-
 
 	def __go_play(self):
 		self.app.switch_scene(GAME, True)

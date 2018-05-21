@@ -158,8 +158,9 @@ class GameScene(BaseScene):
 
 	def update(self, events):
 		for event in events:
-      if event.type == pygame.KEYDOWN and (event.key == pygame.K_SPACE or event.key == pygame.K_ESCAPE):
-                self.app.switch_scene(PAUSE)
+			if event.type == pygame.KEYDOWN and (event.key == pygame.K_SPACE or event.key == pygame.K_ESCAPE):
+				self.app.switch_scene(PAUSE)
+				return
 			if event.type == pygame.MOUSEBUTTONDOWN:
 				if self.selected_square is None:
 					self.select_piece()
@@ -325,7 +326,7 @@ class Board:
 			if self.is_on_board(enemy_pos) and self.matrix_coords(enemy_pos).piece is not None:
 				break
 
-		# if its still the same, did not found an enemy
+		# if its still the same, an enemy wasn't found
 		assert enemy_pos != piece_pos
 		return enemy_pos
 
