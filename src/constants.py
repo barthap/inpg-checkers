@@ -22,3 +22,18 @@ BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
+GREEN = (0, 255, 0)
+YELLOW = (255, 255, 0)
+
+# Move directions definitions
+NW = 'northwest'
+NE = 'northeast'
+SE = 'southeast'
+SW = 'southwest'
+
+# Scene names
+# SCENE = 'filename.ClassName'
+INTRO = 'intro.IntroScene'
+MENU = 'menu.MenuScene'
+GAME = 'game.GameScene'
+PAUSE = 'PUT NAME HERE'

@@ -11,6 +11,7 @@ import pygameMenu.config_menu as _cfg_menu
 import math
 
 
+
 # Main Menu scene
 class supermenu(pygameMenu.TextMenu):
 	def __init__(self,
@@ -257,4 +258,4 @@ class MenuScene(BaseScene):
 
 
 	def __go_play(self):
-		self.app.switch_state(GameScene(self.app))
+		self.app.switch_scene(GAME, True)
