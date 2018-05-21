@@ -434,9 +434,9 @@ class Board:
 							if self.is_on_board(next_tile_pos):
 								next_tile: Square = self.matrix_coords(next_tile_pos)
 								if next_tile.piece is not None and next_tile.piece.color != piece.color:
-									for arg in range(8):    # iterating tiles behind enemy
+									for arg in range(8):  # iterating tiles behind enemy
 										tile_after_pos = self.squares_in_dir(next_tile.location, direction,
-																				number + arg)
+																			 number + arg)
 										if self.is_on_board(tile_after_pos):
 											tile_after: Square = self.matrix_coords(tile_after_pos)
 											if tile_after.piece is None:
@@ -444,6 +444,8 @@ class Board:
 											else:
 												if arg > 0:  # arg = 0 may be king itself
 													break
+								elif next_tile.piece is not None and next_tile.piece.color == piece.color:
+									break
 
 		return hop_moves
 
