@@ -45,8 +45,8 @@ class SceneManager:
 
 		return scene
 
-	def go(self, new_scene: str):
+	def go(self, new_scene: str, reload=False):
 		if self.current is not None:
 			self.current.destroy()
-		self.current = self.get_scene_object(new_scene)
+		self.current = self.get_scene_object(new_scene, reload)
 		self.current.setup()
