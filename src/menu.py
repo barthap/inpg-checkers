@@ -195,7 +195,7 @@ class supermenu(pygameMenu.TextMenu):
 			self.add_line(sliced_text_2)
 		else:
 			self._text.append(text)
-		self.pages_count = len(self._text) // self.lines_per_page
+		self.pages_count = math.ceil(len(self._text) / self.lines_per_page)
 		self.set_title(
 			self.default_title_str + " Page: {actual_page}/{pages_count}".format(actual_page=self.actual_page + 1,
 			                                                                     pages_count=self.pages_count),
