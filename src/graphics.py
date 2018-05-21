@@ -6,7 +6,7 @@ from constants import *
 # Utility class for graphics settings
 class Graphics:
     def __init__(self):
-        self.screen = pygame.display.set_mode((SCREEN_SIZE, SCREEN_SIZE))
+        self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         self.clock = pygame.time.Clock()
         self.fps = 60
 
