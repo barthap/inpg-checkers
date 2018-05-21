@@ -62,7 +62,7 @@ class GameScene(BaseScene):
 				print('same, deselecting')
 				self.deselect_piece()
 
-			if mouse_square.color is BLACK and mouse_square.piece is None:
+			if mouse_square is not None and mouse_square.color is BLACK and mouse_square.piece is None:
 				if mouse_square.location in self.board.legal_moves(self.selected_square.location):
 					if self.can_hop():  # Hop an enemy
 						enemy_pos = self.board.enemy_between(self.selected_square.location, mouse_square.location)
@@ -438,16 +438,19 @@ class Board:
 							if self.is_on_board(next_tile_pos):
 								next_tile: Square = self.matrix_coords(next_tile_pos)
 								if next_tile.piece is not None and next_tile.piece.color != piece.color:
+									do_break = False
 									for arg in range(8):  # iterating tiles behind enemy
-										tile_after_pos = self.squares_in_dir(next_tile.location, direction,
-																			 number + arg)
+										tile_after_pos = self.squares_in_dir(next_tile.location, direction, arg)
 										if self.is_on_board(tile_after_pos):
 											tile_after: Square = self.matrix_coords(tile_after_pos)
 											if tile_after.piece is None:
 												hop_moves.append(tile_after_pos)
 											else:
-												if arg > 0:  # arg = 0 may be king itself
+												if arg > 0:
+													do_break = True
 													break
+									if do_break:
+										break
 								elif next_tile.piece is not None and next_tile.piece.color == piece.color:
 									break
 
