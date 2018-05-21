@@ -27,7 +27,7 @@ class GameScene(BaseScene):
 
 	def select_piece(self):
 		mouse_square: Square = self.mouse_in_what_square()  # just make a variable once
-		if mouse_square.piece is not None and mouse_square.piece.color == self.turn:
+		if mouse_square is not None and mouse_square.piece is not None and mouse_square.piece.color == self.turn:
 			# Somebody else can hop but not me:
 			if self.can_anyone_hop() and not self.can_hop(mouse_square.location):
 				print("Other piece can HOP!")
@@ -95,10 +95,7 @@ class GameScene(BaseScene):
 					return True
 			return False
 		else:  # king = True
-			if len(self.board.hop_possible_squares(location)) >0:
-				return True
-			else:
-				return False
+			return len(self.board.hop_possible_squares(location)) > 0
 
 	# Can anyone hop in this turn
 	def can_anyone_hop(self):
@@ -169,7 +166,8 @@ class GameScene(BaseScene):
 		self.renderer.render_screen(self.board)
 
 	def mouse_in_what_square(self) -> 'Square':
-		return self.board.matrix_coords(what_square(pygame.mouse.get_pos()))
+		sq_pos = what_square(pygame.mouse.get_pos())
+		return self.board.matrix_coords(sq_pos) if self.board.is_on_board(sq_pos) else None
 
 
 class GameRenderer:
@@ -377,19 +375,19 @@ class Board:
 
 		return legal_moves
 
-	def king_move_tiles(self, coords) -> List[Coords]:
+	def king_move_tiles(self, coords: Coords) -> List[Coords]:
 		possible_squares = list()
-		(x, y) = coords
 		for direction in [NW, SW, NE, SE]:
 			for number in range(8):
-				tile: Square = self.matrix_coords(self.squares_in_dir(coords, direction, number))
-				if self.is_on_board(tile.location):
-					next_tile_pos = self.squares_in_dir(tile.location, direction, 1)
+				tile_pos: Coords = self.squares_in_dir(coords, direction, number)
+				if self.is_on_board(tile_pos):
+					next_tile_pos = self.squares_in_dir(tile_pos, direction, 1)
 					next_tile_on_board = self.is_on_board(next_tile_pos)
 					next_tile_has_piece = (next_tile_on_board and self.matrix_coords(next_tile_pos).piece is not None)
+					if tile_pos != coords:
+						possible_squares.append(tile_pos)
 					if (next_tile_on_board is True and next_tile_has_piece is True) or \
 							(next_tile_on_board is False):
-						possible_squares.append(coords)
 						break
 		return possible_squares
 
@@ -399,7 +397,7 @@ class Board:
 		piece: Piece = self.matrix[x][y].piece
 
 		if piece is not None:
-			if piece.king is False:  # piece.king is False:
+			if piece.king is False:
 				for move in self.adjacent_tiles(coords):
 					if move is not None and self.is_on_board(move):
 						# If on adjacent tile there is an enemy
@@ -411,23 +409,22 @@ class Board:
 								hop_moves.append(pos_behind)
 
 			if piece.king is True:
-				possible_squares = list()
 				(x, y) = coords
 				for direction in [NW, SW, NE, SE]:
-					for number in range(8):
-						tile: (x,y) = self.squares_in_dir(coords, direction, number)
+					for number in range(1, 8):
+						tile: (x, y) = self.squares_in_dir(coords, direction, number)
 						if self.is_on_board(tile):
 							next_tile_pos = self.squares_in_dir(tile, direction, 1)
 							if self.is_on_board(next_tile_pos):
 								next_tile: Square = self.matrix_coords(next_tile_pos)
-								if next_tile.piece is not None and next_tile.piece.color == piece.color:
+								if next_tile.piece is not None and next_tile.piece.color != piece.color:
 									for arg in range(8):
 										tile_after_pos = self.squares_in_dir(next_tile.location, direction,
 																				number + arg)
 										if self.is_on_board(tile_after_pos):
 											tile_after: Square = self.matrix_coords(tile_after_pos)
 											if tile_after.piece is None:
-												hop_moves.append(next_tile)
+												hop_moves.append(tile_after_pos)
 
 		return hop_moves
 
