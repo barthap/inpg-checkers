@@ -64,7 +64,7 @@ class GameScene(BaseScene):
 			if mouse_square.color is BLACK and mouse_square.piece is None:
 				if mouse_square.location in self.board.legal_moves(self.selected_square.location):
 					if self.can_hop():  # Hop an enemy
-						enemy_pos = self.board.position_between(self.selected_square.location, mouse_square.location)
+						enemy_pos = self.board.enemy_between(self.selected_square.location, mouse_square.location)
 						enemy_piece = self.board.matrix_coords(enemy_pos)
 						print("HOPPED AN ENEMY!")
 						self.board.remove_piece(enemy_piece)  # Remove an enemy
@@ -303,11 +303,27 @@ class Board:
 				self.matrix[x][y].highlighted = False
 
 	# Used for finding enemy position when hopping
-	@staticmethod
-	def position_between(pos_a: Coords, pos_b: Coords):
-		enemy_pos_x = int(pos_a[0] + (pos_b[0] - pos_a[0]) / 2)
-		enemy_pos_y = int(pos_a[1] + (pos_b[1] - pos_a[1]) / 2)
-		enemy_pos = (enemy_pos_x, enemy_pos_y)
+	def enemy_between(self, piece_pos: Coords, mouse_pos: Coords) -> Coords:
+		(px, py) = piece_pos
+		(mx, my) = mouse_pos
+		if px > mx and py > my:
+			direction = NW
+		elif px > mx and py < my:
+			direction = SW
+		elif px < mx and py < my:
+			direction = SE
+		else:
+			direction = NE
+
+		enemy_pos = piece_pos
+		# iterates fields in direction: Piece pos ---> Mouse pos
+		for i in range(1, 8):
+			enemy_pos = self.squares_in_dir(piece_pos, direction, i)
+			if self.is_on_board(enemy_pos) and self.matrix_coords(enemy_pos).piece is not None:
+				break
+
+		# if its still the same, did not found an enemy
+		assert enemy_pos != piece_pos
 		return enemy_pos
 
 	# Returns coordinates of tile relative ('number' fields away) to a position in specified direction
@@ -378,13 +394,13 @@ class Board:
 	def king_move_tiles(self, coords: Coords) -> List[Coords]:
 		possible_squares = list()
 		for direction in [NW, SW, NE, SE]:
-			for number in range(8):
+			for number in range(8):  # 0-7 tiles away
 				tile_pos: Coords = self.squares_in_dir(coords, direction, number)
 				if self.is_on_board(tile_pos):
 					next_tile_pos = self.squares_in_dir(tile_pos, direction, 1)
 					next_tile_on_board = self.is_on_board(next_tile_pos)
 					next_tile_has_piece = (next_tile_on_board and self.matrix_coords(next_tile_pos).piece is not None)
-					if tile_pos != coords:
+					if tile_pos != coords:  # moving nowhere is illegal
 						possible_squares.append(tile_pos)
 					if (next_tile_on_board is True and next_tile_has_piece is True) or \
 							(next_tile_on_board is False):
@@ -408,23 +424,26 @@ class Board:
 							if self.is_on_board(pos_behind) and self.matrix_coords(pos_behind).piece is None:
 								hop_moves.append(pos_behind)
 
-			if piece.king is True:
+			else:  # elif piece.king is True:
 				(x, y) = coords
 				for direction in [NW, SW, NE, SE]:
-					for number in range(1, 8):
+					for number in range(8):
 						tile: (x, y) = self.squares_in_dir(coords, direction, number)
 						if self.is_on_board(tile):
 							next_tile_pos = self.squares_in_dir(tile, direction, 1)
 							if self.is_on_board(next_tile_pos):
 								next_tile: Square = self.matrix_coords(next_tile_pos)
 								if next_tile.piece is not None and next_tile.piece.color != piece.color:
-									for arg in range(8):
+									for arg in range(8):    # iterating tiles behind enemy
 										tile_after_pos = self.squares_in_dir(next_tile.location, direction,
 																				number + arg)
 										if self.is_on_board(tile_after_pos):
 											tile_after: Square = self.matrix_coords(tile_after_pos)
 											if tile_after.piece is None:
 												hop_moves.append(tile_after_pos)
+											else:
+												if arg > 0:  # arg = 0 may be king itself
+													break
 
 		return hop_moves
 
