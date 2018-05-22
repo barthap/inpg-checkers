@@ -24,7 +24,7 @@ def set_pieces(board: Board, pieces: Tuple[Coords, Piece]) -> None:
 		pos = p[0]
 		piece = p[1]
 		assert Board.is_on_board(pos)
-		sq = board.matrix_coords(pos)
+		sq = board.get_square(pos)
 		assert sq is not None
 		sq.piece = piece
 
@@ -59,7 +59,7 @@ class BoardTests(unittest.TestCase):
 	def test_isMatrixEmpty(self):
 		for x in range(8):
 			for y in range(8):
-				sq = self.board.matrix_coords((x, y))
+				sq = self.board.get_square((x, y))
 				if sq is not None and sq.color == BLACK:
 					self.assertIn((x, y), Board.all_board_coords())
 					self.assertIsNone(sq.piece)
@@ -120,12 +120,12 @@ class GameLogicTests(unittest.TestCase):
 		print("After:")
 		draw_ascii_board(self.board)
 
-		self.assertFalse(self.board.matrix_coords((0, 0)).piece.king)
-		self.assertTrue(self.board.matrix_coords((2, 0)).piece.king)
-		self.assertFalse(self.board.matrix_coords((0, 2)).piece.king)
-		self.assertFalse(self.board.matrix_coords((0, 6)).piece.king)
-		self.assertTrue(self.board.matrix_coords((1, 7)).piece.king)
-		self.assertFalse(self.board.matrix_coords((3, 7)).piece.king)
+		self.assertFalse(self.board[(0, 0)].piece.king)
+		self.assertTrue (self.board[(2, 0)].piece.king)
+		self.assertFalse(self.board[(0, 2)].piece.king)
+		self.assertFalse(self.board[(0, 6)].piece.king)
+		self.assertTrue (self.board[(1, 7)].piece.king)
+		self.assertFalse(self.board[(3, 7)].piece.king)
 
 
 	def test_normalMove(self):

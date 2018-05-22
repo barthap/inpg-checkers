@@ -12,8 +12,6 @@ Coords = Tuple[int, int]
 Color = Tuple[int, int, int]
 SquareMatrix = List[List['Square']]
 
-# Try with 2 ;)
-# tutaj zmieniać, jeżeli w opcjach zostanie zmieniony wariant gry pomięddzy 2-3 rzędy
 num_piece_rows = int(cfg.get('GENERAL', 'StartPieceRows'))
 
 
@@ -22,6 +20,7 @@ class GameScene(BaseScene):
 	def __init__(self, app: 'App'):
 		super().__init__(app)
 		self.renderer = GameRenderer(app.graphics)
+		self.resource_manager = ResourceManager()
 		self.board: Board = Board()
 		self.turn: Color = BLUE
 		self.selected_square: Square = None  # Board square
@@ -45,7 +44,7 @@ class GameScene(BaseScene):
 			print('legal:')
 			for location in legal_moves:
 				print(location)
-				self.board.matrix_coords(location).highlighted = True
+				self.board[location].highlighted = True
 		else:
 			print('no legal moves')
 			self.deselect_piece()
@@ -66,8 +65,9 @@ class GameScene(BaseScene):
 				if mouse_square.location in self.board.legal_moves(self.selected_square.location):
 					if self.can_hop():  # Hop an enemy
 						enemy_pos = self.board.enemy_between(self.selected_square.location, mouse_square.location)
-						enemy_piece = self.board.matrix_coords(enemy_pos)
+						enemy_piece = self.board.get_square(enemy_pos)
 						print("HOPPED AN ENEMY!")
+						self.play_piece_sound(True)
 						self.board.remove_piece(enemy_piece)  # Remove an enemy
 						self.board.remove_all_highlights()  # Remove old highlights
 						mouse_square.piece = self.selected_square.piece
@@ -77,6 +77,7 @@ class GameScene(BaseScene):
 							self.deselect_piece()
 							self.switch_turn()
 					else:
+						self.play_piece_sound(False)
 						mouse_square.piece = self.selected_square.piece
 						self.board.remove_piece(self.selected_square)
 						self.deselect_piece()
@@ -89,7 +90,7 @@ class GameScene(BaseScene):
 				return False
 			location = self.selected_square.location
 
-		if self.board.matrix_coords(location).piece.king is False:
+		if self.board[location].piece.king is False:
 			adj = self.board.adjacent_tiles(location)
 			for move in self.board.legal_moves(location):
 				if move not in adj:
@@ -101,7 +102,7 @@ class GameScene(BaseScene):
 	# Can anyone hop in this turn
 	def can_anyone_hop(self):
 		for (x, y) in Board.all_board_coords():
-			sq = self.board.matrix_coords((x, y))
+			sq = self.board[(x, y)]
 			if sq.piece is not None and sq.piece.color == self.turn:
 				if self.can_hop((x, y)):
 					return True
@@ -113,7 +114,7 @@ class GameScene(BaseScene):
 
 		# Firstly get all squares with pieces matching turn color
 		for pos in Board.all_board_coords():
-			sq = self.board.matrix_coords(pos)
+			sq = self.board.get_square(pos)
 			if sq.piece is not None and sq.piece.color == turn:
 				squares.append(sq)
 
@@ -127,7 +128,7 @@ class GameScene(BaseScene):
 	# Returns True if there are any pieces with specified color left
 	def has_any_pieces(self, turn: Color) -> bool:
 		for pos in Board.all_board_coords():
-			sq = self.board.matrix_coords(pos)
+			sq = self.board.get_square(pos)
 			if sq.piece is not None and sq.piece.color == turn:
 				return True
 		return False
@@ -149,9 +150,22 @@ class GameScene(BaseScene):
 		end_game, winner = self.is_end_game()
 		if end_game is True:
 			print("END GAME,", ("RED" if winner is RED else "BLUE"), "Wins!")
+			self.resource_manager.get_sound('end_game.wav').play()
 		else:
 			self.turn = BLUE if self.turn is RED else RED  # if red then blue, else RED xD
 			print("Current turn: " + ("RED" if self.turn is RED else "BLUE"))
+
+	def play_piece_sound(self, hop=False):
+		if self.selected_square.piece.king is True:
+			if hop:
+				self.resource_manager.get_sound('king_hop.wav').play()
+			else:
+				self.resource_manager.get_sound('king.wav').play()
+		else:
+			if hop:
+				self.resource_manager.get_sound('hop.wav').play()
+			else:
+				self.resource_manager.get_sound('move.wav').play()
 
 	def setup(self):
 		pass
@@ -171,7 +185,7 @@ class GameScene(BaseScene):
 
 	def mouse_in_what_square(self) -> 'Square':
 		sq_pos = what_square(pygame.mouse.get_pos())
-		return self.board.matrix_coords(sq_pos) if self.board.is_on_board(sq_pos) else None
+		return self.board[sq_pos] if self.board.is_on_board(sq_pos) else None
 
 
 class GameRenderer:
@@ -180,10 +194,10 @@ class GameRenderer:
 		self.graphics = graphics
 		self.bg = resource_manager.get_image('board.png')
 		self.bg_rect = self.bg.get_rect()
-		self.redpiece = resource_manager.get_image('redpiece.png')
-		self.bluepiece = resource_manager.get_image('bluepiece.png')
-		self.blueking = resource_manager.get_image('blueking.png')
-		self.redking = resource_manager.get_image('redking.png')
+		self.red_piece = resource_manager.get_image('redpiece.png')
+		self.blue_piece = resource_manager.get_image('bluepiece.png')
+		self.blue_king = resource_manager.get_image('blueking.png')
+		self.red_king = resource_manager.get_image('redking.png')
 
 	def generate_bg(self) -> None:
 		self.graphics.clear_screen()
@@ -194,23 +208,17 @@ class GameRenderer:
 		self.draw_highlighted_squares(board)
 		self.draw_board_pieces(board)
 
-	# tutaj dodawać funkcje rysujące na ekran
-
 	def draw_board_pieces(self, board: 'Board') -> None:
 		for (x, y) in Board.all_board_coords():
-			if board.matrix_coords((x, y)).piece is not None:
-				if board.matrix_coords((x, y)).piece.color == RED and board.matrix_coords(
-						(x, y)).piece.king == False:
-					self.graphics.draw(self.redpiece, what_pixel((x, y)))
-				elif board.matrix_coords((x, y)).piece.color == RED and board.matrix_coords(
-						(x, y)).piece.king == True:
-					self.graphics.draw(self.redking, what_pixel((x, y)))
-				elif board.matrix_coords((x, y)).piece.color == BLUE and board.matrix_coords(
-						(x, y)).piece.king == True:
-					self.graphics.draw(self.blueking, what_pixel((x, y)))
-				elif board.matrix_coords((x, y)).piece.color == BLUE and board.matrix_coords(
-						(x, y)).piece.king == False:
-					self.graphics.draw(self.bluepiece, what_pixel((x, y)))
+			if board[(x, y)].piece is not None:
+				if board[(x, y)].piece.color == RED and board[(x, y)].piece.king is False:
+					self.graphics.draw(self.red_piece, what_pixel((x, y)))
+				elif board[(x, y)].piece.color == RED and board[(x, y)].piece.king is True:
+					self.graphics.draw(self.red_king, what_pixel((x, y)))
+				elif board[(x, y)].piece.color == BLUE and board[(x, y)].piece.king is True:
+					self.graphics.draw(self.blue_king, what_pixel((x, y)))
+				elif board[(x, y)].piece.color == BLUE and board[(x, y)].piece.king is False:
+					self.graphics.draw(self.blue_piece, what_pixel((x, y)))
 
 	def draw_highlighted_squares(self, board: 'Board', color=GREEN) -> None:
 		rect_surface = pygame.Surface((SQUARE_SIZE, SQUARE_SIZE))
@@ -219,7 +227,7 @@ class GameRenderer:
 		for x in range(8):
 			for y in range(8):
 				pos = (x, y)
-				if board.matrix_coords(pos).highlighted is True:
+				if board.get_square(pos).highlighted is True:
 					self.graphics.draw(rect_surface, what_pixel(pos))
 
 
@@ -247,12 +255,16 @@ class Board:
 	def __init__(self):
 		self.matrix: SquareMatrix = self.generate_board_matrix()
 
-	def matrix_coords(self, coords: Coords) -> 'Square':
+	def get_square(self, coords: Coords) -> 'Square':
 		(x, y) = coords
 		if not self.is_on_board(coords):
 			raise IndexError("Coords " + str(coords) + " are outside of board")
 
 		return self.matrix[x][y]
+
+	# Allows using board[coords] or board[(x, y)] instead of board.get_square(...), earlier matrix_coords()
+	def __getitem__(self, item: Coords) -> 'Square':
+		return self.get_square(item)
 
 	@staticmethod
 	def remove_piece(square: 'Square') -> None:
@@ -324,7 +336,7 @@ class Board:
 		# iterates fields in direction: Piece pos ---> Mouse pos
 		for i in range(1, 8):
 			enemy_pos = self.squares_in_dir(piece_pos, direction, i)
-			if self.is_on_board(enemy_pos) and self.matrix_coords(enemy_pos).piece is not None:
+			if self.is_on_board(enemy_pos) and self.get_square(enemy_pos).piece is not None:
 				break
 
 		# if its still the same, an enemy wasn't found
@@ -369,19 +381,19 @@ class Board:
 			if piece.king is False:
 				if piece.color is BLUE:
 					nw_dir = self.squares_in_dir(coords, NW, 1)
-					if self.is_on_board(nw_dir) and self.matrix_coords(nw_dir).piece is None:
+					if self.is_on_board(nw_dir) and self.get_square(nw_dir).piece is None:
 						normal_legal_moves.append(nw_dir)
 
 					ne_dir = self.squares_in_dir(coords, NE, 1)
-					if self.is_on_board(ne_dir) and self.matrix_coords(ne_dir).piece is None:
+					if self.is_on_board(ne_dir) and self.get_square(ne_dir).piece is None:
 						normal_legal_moves.append(ne_dir)
 				elif piece.color is RED:
 					sw_dir = self.squares_in_dir(coords, SW, 1)
-					if self.is_on_board(sw_dir) and self.matrix_coords(sw_dir).piece is None:
+					if self.is_on_board(sw_dir) and self.get_square(sw_dir).piece is None:
 						normal_legal_moves.append(sw_dir)
 
 					se_dir = self.squares_in_dir(coords, SE, 1)
-					if self.is_on_board(se_dir) and self.matrix_coords(se_dir).piece is None:
+					if self.is_on_board(se_dir) and self.get_square(se_dir).piece is None:
 						normal_legal_moves.append(se_dir)
 			# If king is True
 			if piece.king is True:
@@ -406,7 +418,7 @@ class Board:
 				if self.is_on_board(tile_pos):
 					next_tile_pos = self.squares_in_dir(tile_pos, direction, 1)
 					next_tile_on_board = self.is_on_board(next_tile_pos)
-					next_tile_has_piece = (next_tile_on_board and self.matrix_coords(next_tile_pos).piece is not None)
+					next_tile_has_piece = (next_tile_on_board and self.get_square(next_tile_pos).piece is not None)
 					if tile_pos != coords:  # moving nowhere is illegal
 						possible_squares.append(tile_pos)
 					if (next_tile_on_board is True and next_tile_has_piece is True) or \
@@ -424,11 +436,11 @@ class Board:
 				for move in self.adjacent_tiles(coords):
 					if move is not None and self.is_on_board(move):
 						# If on adjacent tile there is an enemy
-						if self.matrix_coords(move).piece is not None and self.matrix_coords(
-								move).piece.color != self.matrix_coords(coords).piece.color:
+						if self.get_square(move).piece is not None and self.get_square(
+								move).piece.color != self.get_square(coords).piece.color:
 							# Position one behind enemy
 							pos_behind = (move[0] + (move[0] - coords[0]), move[1] + (move[1] - coords[1]))
-							if self.is_on_board(pos_behind) and self.matrix_coords(pos_behind).piece is None:
+							if self.is_on_board(pos_behind) and self.get_square(pos_behind).piece is None:
 								hop_moves.append(pos_behind)
 
 			else:  # elif piece.king is True:
@@ -439,17 +451,17 @@ class Board:
 						if self.is_on_board(tile):
 							next_tile_pos = self.squares_in_dir(tile, direction, 1)
 							if self.is_on_board(next_tile_pos):
-								next_tile: Square = self.matrix_coords(next_tile_pos)
+								next_tile: Square = self.get_square(next_tile_pos)
 								if next_tile.piece is not None and next_tile.piece.color != piece.color:
 									do_break = False
 									for arg in range(8):  # iterating tiles behind enemy
 										tile_after_pos = self.squares_in_dir(next_tile.location, direction, arg)
 										if self.is_on_board(tile_after_pos):
-											tile_after: Square = self.matrix_coords(tile_after_pos)
+											tile_after: Square = self.get_square(tile_after_pos)
 											if tile_after.piece is None:
 												hop_moves.append(tile_after_pos)
 											else:
-												if arg > 0:
+												if arg > 0:    # arg = 0 is hopped enemy
 													do_break = True
 													break
 									if do_break:
@@ -462,11 +474,11 @@ class Board:
 	def knight_possible(self):
 		for x in range(8):
 			for y in range(7, 8):
-				piece: Piece = self.matrix_coords((x, y)).piece
+				piece: Piece = self.matrix[x][y].piece
 				if piece is not None and piece.color == RED:
 					piece.king = True
 			for y in range(1):
-				piece: Piece = self.matrix_coords((x, y)).piece
+				piece: Piece = self.matrix[x][y].piece
 				if piece is not None and piece.color == BLUE:
 					piece.king = True
 
