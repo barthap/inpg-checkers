@@ -1,4 +1,4 @@
-# INPG Checkers
+# INPG Checkers [![Build Status](https://travis-ci.org/barthap/inpg-checkers.svg?branch=unittests)](https://travis-ci.org/barthap/inpg-checkers)
 A simple checkers game project for INPG (IT tools for team work)
 
 ### Installation:

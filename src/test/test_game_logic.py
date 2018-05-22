@@ -1,14 +1,19 @@
 import unittest
 
-from constants import RED, BLUE, BLACK, SE, NE, NW, SW
+from constants import RED, BLUE, BLACK, SE, NE, NW, SW, WHITE
 from game import Board, Piece, Square, SquareMatrix
 
 
 # Utility functions
 def setup_empty_matrix() -> SquareMatrix:
-	empty_matrix = [ [None]*8 for _ in range(8)]
-	for (x, y) in Board.all_board_coords():
-		empty_matrix[x][y] = Square(BLACK, (x, y))
+	empty_matrix = [[None]*8 for _ in range(8)]
+
+	for x in range(8):
+		for y in range(8):
+			if (x, y) in Board.all_board_coords():
+				empty_matrix[x][y] = Square(BLACK, (x, y))
+			else:
+				empty_matrix[x][y] = Square(WHITE, (x, y))
 
 	return empty_matrix
 
@@ -54,7 +59,7 @@ class BoardTests(unittest.TestCase):
 		for x in range(8):
 			for y in range(8):
 				sq = self.board.matrix_coords((x, y))
-				if sq is not None:
+				if sq is not None and sq.color == BLACK:
 					self.assertIn((x, y), Board.all_board_coords())
 					self.assertIsNone(sq.piece)
 					self.assertEqual(sq.color, BLACK)
@@ -98,6 +103,29 @@ class GameLogicTests(unittest.TestCase):
 	def setUp(self):
 		self.board = Board()
 		self.board.matrix = setup_empty_matrix()
+
+	def test_knightPossible(self):
+		pieces = [((0, 0), Piece(RED, False)),
+		          ((2, 0), Piece(BLUE, False)),
+		          ((0, 2), Piece(RED, False)),
+		          ((0, 6), Piece(RED, False)),
+		          ((1, 7), Piece(RED, False)),
+		          ((3, 7), Piece(BLUE, False))]
+		set_pieces(self.board, pieces)
+		print("Knight possible test before:")
+		draw_ascii_board(self.board)
+
+		self.board.knight_possible()
+		print("After:")
+		draw_ascii_board(self.board)
+
+		self.assertFalse(self.board.matrix_coords((0, 0)).piece.king)
+		self.assertTrue(self.board.matrix_coords((2, 0)).piece.king)
+		self.assertFalse(self.board.matrix_coords((0, 2)).piece.king)
+		self.assertFalse(self.board.matrix_coords((0, 6)).piece.king)
+		self.assertTrue(self.board.matrix_coords((1, 7)).piece.king)
+		self.assertFalse(self.board.matrix_coords((3, 7)).piece.king)
+
 
 	def test_normalMove(self):
 		blue_pos = (3, 5)
