@@ -37,3 +37,7 @@ INTRO = 'intro.IntroScene'
 MENU = 'menu.MenuScene'
 GAME = 'game.GameScene'
 PAUSE = 'pause.PauseScene'
+
+# Config file names
+CONFIG_FILE = 'config.ini'
+LOCALE_FILE = 'locale.ini'

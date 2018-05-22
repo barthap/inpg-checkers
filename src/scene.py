@@ -1,8 +1,6 @@
 from typing import Dict
 import pydoc
 
-from constants import *
-
 
 # Base class for game scene (Intro, Menu, Game etc.). All states should derive from it
 # TODO: Make it abstract

@@ -1,6 +1,6 @@
 import pygame
 
-from constants import *
+from utils.constants import *
 from scene import BaseScene
 
 

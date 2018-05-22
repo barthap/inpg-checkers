@@ -2,9 +2,8 @@ import pygame
 import pygameMenu  # This imports classes and other things
 from pygameMenu.locals import *  # Import constants (like actions)
 
-from constants import *
+from utils.constants import *
 from scene import BaseScene
-from game import GameScene
 import pygame.gfxdraw as _gfxdraw
 import pygameMenu.config_textmenu as _cfg
 import pygameMenu.config_menu as _cfg_menu

@@ -1,11 +1,11 @@
 import pygame
 
-from resources import ResourceManager
+from utils.resources import ResourceManager
 from scene import BaseScene
-from constants import *
+from utils.constants import *
 from graphics import Graphics
-from pause import PauseScene
 from typing import Tuple, List, Set
+import utils.config as cfg
 
 # Type definitions
 Coords = Tuple[int, int]
@@ -14,14 +14,14 @@ SquareMatrix = List[List['Square']]
 
 # Try with 2 ;)
 # tutaj zmieniać, jeżeli w opcjach zostanie zmieniony wariant gry pomięddzy 2-3 rzędy
-num_piece_rows = 3
+num_piece_rows = int(cfg.get('GENERAL', 'StartPieceRows'))
 
 
 # Main Game code
 class GameScene(BaseScene):
 	def __init__(self, app: 'App'):
 		super().__init__(app)
-		self.renderer = GameRenderer(app.graphics, app.resource_manager)
+		self.renderer = GameRenderer(app.graphics)
 		self.board: Board = Board()
 		self.turn: Color = BLUE
 		self.selected_square: Square = None  # Board square
@@ -175,7 +175,8 @@ class GameScene(BaseScene):
 
 
 class GameRenderer:
-	def __init__(self, graphics: Graphics, resource_manager: ResourceManager):
+	def __init__(self, graphics: Graphics):
+		resource_manager = ResourceManager()
 		self.graphics = graphics
 		self.bg = resource_manager.get_image('board.png')
 		self.bg_rect = self.bg.get_rect()
@@ -332,7 +333,8 @@ class Board:
 
 	# Returns coordinates of tile relative ('number' fields away) to a position in specified direction
 	# DOES NOT CHECK IF ON BOARD!
-	def squares_in_dir(self, position: Coords, direction, number: int = 1) -> Coords:
+	@staticmethod
+	def squares_in_dir(position: Coords, direction, number: int = 1) -> Coords:
 		(x, y) = position
 		if direction == NW:
 			return x - number, y - number
@@ -345,11 +347,12 @@ class Board:
 
 	# Returns coordinates of all tiles adjacent to specified position
 	# DOES NOT CHECK IF ON BOARD!
-	def adjacent_tiles(self, pos: Coords) -> List[Coords]:
-		return [self.squares_in_dir(pos, NE),
-				self.squares_in_dir(pos, NW),
-				self.squares_in_dir(pos, SE),
-				self.squares_in_dir(pos, SW)]
+	@staticmethod
+	def adjacent_tiles(pos: Coords) -> List[Coords]:
+		return [Board.squares_in_dir(pos, NE),
+		        Board.squares_in_dir(pos, NW),
+		        Board.squares_in_dir(pos, SE),
+		        Board.squares_in_dir(pos, SW)]
 
 	@staticmethod
 	def is_on_board(coords: Coords) -> bool:

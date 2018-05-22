@@ -37,6 +37,9 @@ Two fields are most important here:
 - Script path: `src/main.py`, 
 - Working Directory: location of `inpg-checkers` directory
 
+To make PyCharm resolve `import` statements correctly, you should also mark `src` directory as source root.
+Click RMB on `src` folder, then _Mark Directory as -> Source root_.
+
 ### Authors
 *TODO: Add Authors here* 
 

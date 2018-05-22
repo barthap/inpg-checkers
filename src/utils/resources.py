@@ -1,13 +1,16 @@
 import pygame
 import os
 
-from constants import *
+from utils.singleton import singleton
+from utils.constants import *
 
 
 # This class is used to load images (and in future other resources) only once and keep their reference in memory
 # Also, it simplifies loading resource methods
+@singleton
 class ResourceManager:
     def __init__(self):
+        print("Initializing Resource Manager")
         self.__image_library = {}
 
     # Use this to load image

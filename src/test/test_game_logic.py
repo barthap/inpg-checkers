@@ -1,7 +1,8 @@
 import unittest
+from typing import Tuple
 
-from constants import RED, BLUE, BLACK, SE, NE, NW, SW, WHITE
-from game import Board, Piece, Square, SquareMatrix
+from utils.constants import RED, BLUE, BLACK, SE, NE, NW, SW, WHITE
+from game import Board, Piece, Square, SquareMatrix, Coords
 
 
 # Utility functions
@@ -18,7 +19,7 @@ def setup_empty_matrix() -> SquareMatrix:
 	return empty_matrix
 
 
-def set_pieces(board, pieces):
+def set_pieces(board: Board, pieces: Tuple[Coords, Piece]) -> None:
 	for p in pieces:
 		pos = p[0]
 		piece = p[1]
@@ -28,7 +29,7 @@ def set_pieces(board, pieces):
 		sq.piece = piece
 
 
-def draw_ascii_board(board):
+def draw_ascii_board(board: Board) -> None:
 	print("     ", end="", flush=False)
 	for i in range(8):
 		print(i, end="  |  ", flush=False)

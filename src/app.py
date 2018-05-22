@@ -1,16 +1,16 @@
-from typing import Type
-
 import pygame
 
 from graphics import Graphics
-from constants import *
-from resources import ResourceManager
+from utils.constants import *
+from utils.resources import ResourceManager
 import scene
+import utils.config as cfg
 
 
 # Main App class, initializes game, runs main loops, handles events etc
 class App:
 	def __init__(self):
+		cfg.init()
 		self.graphics = Graphics()  # PyGame rendering/graphic utils
 		self.resource_manager = ResourceManager()
 		self.__running = True  # Flag determines if main loop should still run
