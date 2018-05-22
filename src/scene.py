@@ -1,10 +1,10 @@
+from abc import ABC
 from typing import Dict
 import pydoc
 
 
 # Base class for game scene (Intro, Menu, Game etc.). All states should derive from it
-# TODO: Make it abstract
-class BaseScene:
+class BaseScene(ABC):
 	def __init__(self, app: 'App'):
 		self.app = app
 

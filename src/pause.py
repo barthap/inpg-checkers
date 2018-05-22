@@ -2,6 +2,7 @@ import pygame
 
 from utils.constants import *
 from scene import BaseScene
+import utils.locale as i18n
 
 
 class PauseScene(BaseScene):
@@ -16,7 +17,7 @@ class PauseScene(BaseScene):
 		self.app.graphics.draw(self.img, self.img_rect)
 
 		font = pygame.font.SysFont("comicsansms", 24)
-		text = font.render("Press space to continue or ESC to return to main menu", True, (0, 255, 0))
+		text = font.render(i18n.get('pause'), True, (0, 255, 0))
 
 		# Set text coordinates
 		text_x = SCREEN_WIDTH / 2 - text.get_width() // 2

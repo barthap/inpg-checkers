@@ -1,6 +1,7 @@
 import pygame
 
 from utils.constants import *
+import utils.locale as i18n
 from scene import BaseScene
 
 
@@ -18,7 +19,7 @@ class IntroScene(BaseScene):
 		self.app.graphics.draw(self.img, self.img_rect)
 
 		font = pygame.font.SysFont("comicsansms", 24)
-		text = font.render("Wciśnij Enter lub Spację, aby rozpocząć", True, GREEN)
+		text = font.render(i18n.get('intro'), True, GREEN)
 
 		# Set text coordinates
 		text_x = SCREEN_WIDTH / 2 - text.get_width() // 2

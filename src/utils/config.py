@@ -13,11 +13,6 @@ def config_exists() -> bool:
 	return file.is_file()
 
 
-def locale_exists() -> bool:
-	file = Path(LOCALE_FILE)
-	return file.is_file()
-
-
 def save():
 	global __cfg
 	with open(CONFIG_FILE, 'w') as file:
@@ -49,7 +44,7 @@ def __create_default_cfg() -> cp.ConfigParser:
 	cfg = cp.ConfigParser()
 	cfg['GENERAL'] = {}
 	gen = cfg['GENERAL']
-	gen['locale'] = 'en'
+	gen['locale'] = 'english'
 	gen['StartPieceRows'] = '3'
 	return cfg
 

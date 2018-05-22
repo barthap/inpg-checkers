@@ -8,7 +8,7 @@ import pygame.gfxdraw as _gfxdraw
 import pygameMenu.config_textmenu as _cfg
 import pygameMenu.config_menu as _cfg_menu
 import math
-
+import utils.locale as i18n
 
 
 # Main Menu scene
@@ -50,7 +50,7 @@ class supermenu(pygameMenu.TextMenu):
 		self.button_region_y = button_region_y
 		self.default_title_str = title
 		self.set_title(
-			self.default_title_str + " Page: {actual_page}/{pages_count}".format(actual_page=self.actual_page + 1,
+			self.default_title_str + " " + i18n.get('page') + ": {actual_page}/{pages_count}".format(actual_page=self.actual_page + 1,
 																		pages_count=self.pages_count),
 			self._title_offsetx, self._title_offsety)
 
@@ -79,14 +79,14 @@ class supermenu(pygameMenu.TextMenu):
 		dysum = 0.5 * self.lines_per_page * (self._actual._font_textsize)
 
 		if(self.actual_page>0):
-			instruction1 = "<- previous"
+			instruction1 = "<- " + i18n.get('prev')
 			text = self._actual._fonttext.render(instruction1, 1,self._actual._font_textcolor)
 			self._surface.blit(text, (self._actual._pos_text_x + 40, ((self._height - (self.lines_per_page
 			        * self._actual._font_textsize + self._actual._title_rect[4][1]))/2) - self._actual._font_textsize
 			        + (self.lines_per_page * self._actual._font_textsize + self._actual._title_rect[4][1])))
 
 		if(self.actual_page<self.pages_count-1):
-			instruction2 = "next ->"
+			instruction2 = i18n.get('next') + " ->"
 			text = self._actual._fonttext.render(instruction2, 1,self._actual._font_textcolor)
 			self._surface.blit(text, (self._width-self._actual._pos_text_x - 40 - self.text_width_char
 			        * len(instruction2),((self._height- (self.lines_per_page
@@ -196,7 +196,7 @@ class supermenu(pygameMenu.TextMenu):
 			self._text.append(text)
 		self.pages_count = math.ceil(len(self._text) / self.lines_per_page)
 		self.set_title(
-			self.default_title_str + " Page: {actual_page}/{pages_count}".format(actual_page=self.actual_page + 1,
+			self.default_title_str + " " + i18n.get('page') + ": {actual_page}/{pages_count}".format(actual_page=self.actual_page + 1,
 			                                                                     pages_count=self.pages_count),
 			self._title_offsetx, self._title_offsety)
 
@@ -204,13 +204,13 @@ class supermenu(pygameMenu.TextMenu):
 		for event in events:
 			if event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT and self.actual_page > 0:
 				self.actual_page -= 1
-				self.set_title(self.default_title_str + " Page: {actual_page}/{pages_count}".format(
+				self.set_title(self.default_title_str + " " + i18n.get('page') + ": {actual_page}/{pages_count}".format(
 					actual_page=self.actual_page + 1, pages_count=self.pages_count), self._title_offsetx,
 									self._title_offsety)
 
 			if event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT and self.actual_page < self.pages_count - 1:
 				self.actual_page += 1
-				self.set_title(self.default_title_str + " Page: {actual_page}/{pages_count}".format(
+				self.set_title(self.default_title_str + " " + i18n.get('page') + ": {actual_page}/{pages_count}".format(
 					actual_page=self.actual_page + 1, pages_count=self.pages_count), self._title_offsetx,
 									self._title_offsety)
 
@@ -223,14 +223,14 @@ class MenuScene(BaseScene):
 		self.menu = pygameMenu.Menu(app.graphics.screen, window_width=SCREEN_WIDTH, window_height=SCREEN_HEIGHT,
 									menu_width=SCREEN_WIDTH, menu_height=SCREEN_HEIGHT,
 									font=pygameMenu.fonts.FONT_NEVIS,
-									title='Main menu', bgfun=None, dopause=False)
+									title=i18n.get('main_menu'), bgfun=None, dopause=False)
 
 		# Show the rules
 		self.help_menu = supermenu(app.graphics.screen, window_width=SCREEN_WIDTH, window_height=SCREEN_HEIGHT,
 									menu_width=SCREEN_WIDTH, menu_height=SCREEN_HEIGHT,
 									font=pygameMenu.fonts.FONT_FRANCHISE,
 									onclose=PYGAME_MENU_DISABLE_CLOSE,
-									title='Help', dopause=False,
+									title=i18n.get('rules_title'), dopause=False,
 									menu_color_title=(120, 45, 30),
 									menu_color=(30, 50, 107),
 									button_region_y=50)
@@ -238,15 +238,15 @@ class MenuScene(BaseScene):
 	def setup(self):
 		self.app.graphics.clear_screen()
 
-		self.menu.add_option('Play', self.__go_play)  # Add timer submenu
-		self.menu.add_option('Rules', self.help_menu)
-		self.menu.add_option('Exit', self.app.exit)  # Add exit function
+		self.menu.add_option(i18n.get('play'), self.__go_play)  # Add timer submenu
+		self.menu.add_option(i18n.get('rules'), self.help_menu)
+		self.menu.add_option(i18n.get('exit'), self.app.exit)  # Add exit function
 
 		HELP = open("resources/rules.txt", "r")
 
 		for line in HELP:
 			self.help_menu.add_line(line)  # Add line
-		self.help_menu.add_option('Return to Menu', PYGAME_MENU_BACK)  # Add option
+		self.help_menu.add_option(i18n.get('return_to_menu'), PYGAME_MENU_BACK)  # Add option
 
 		HELP.close()
 

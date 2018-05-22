@@ -1,6 +1,6 @@
 import pygame
 import os
-
+from pathlib import Path
 from utils.singleton import singleton
 from utils.constants import *
 
@@ -21,6 +21,9 @@ class ResourceManager:
         if image is None:
             img_path = RESOURCE_PATH + os.sep + IMAGE_PATH + os.sep + path
             canonical_path = img_path.replace('/', os.sep).replace('\\', os.sep)
+            file = Path(canonical_path)
+            if not file.is_file():
+                raise FileNotFoundError("Couldn't load image: " + canonical_path)
             image = pygame.image.load(canonical_path)
             self.__image_library[path] = image
 
