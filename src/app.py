@@ -46,7 +46,6 @@ class App:
 	# Main loop content
 	def __main_loop(self):
 		# Handle Events
-		# TODO: Add in-game Event System
 		events = pygame.event.get()
 		for event in events:
 			if event.type == pygame.QUIT:
