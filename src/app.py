@@ -1,3 +1,5 @@
+import sys
+
 import pygame
 
 from graphics import Graphics
@@ -62,4 +64,4 @@ class App:
 		self.scene_manager.current.destroy()
 		print("Game finished, closing")
 		pygame.quit()
-		quit()
+		sys.exit()

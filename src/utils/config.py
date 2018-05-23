@@ -13,13 +13,13 @@ def config_exists() -> bool:
 	return file.is_file()
 
 
-def save():
+def save() -> None:
 	global __cfg
 	with open(CONFIG_FILE, 'w') as file:
 		__cfg.write(file)
 
 
-def init():
+def init() -> None:
 	global __cfg
 	if __cfg is None:
 		if config_exists():
@@ -47,6 +47,9 @@ def __create_default_cfg() -> cp.ConfigParser:
 	gen = cfg['GENERAL']
 	gen['locale'] = 'english'
 	gen['StartPieceRows'] = '3'
+	gen['sounds'] = 'yes'
+	gen['blue_name'] = 'Player 1'
+	gen['red_name'] = 'Player 2'
 	return cfg
 
 
