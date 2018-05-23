@@ -1,6 +1,8 @@
 import unittest
+import unittest.mock
 from typing import Tuple
 
+import game
 from utils.constants import RED, BLUE, BLACK, SE, NE, NW, SW, WHITE
 from game import Board, Piece, Square, SquareMatrix, Coords
 
@@ -100,7 +102,7 @@ class BoardTests(unittest.TestCase):
 		self.assertFalse(Board.is_on_board((-1, 0)))
 
 
-class GameLogicTests(unittest.TestCase):
+class BoardLogicTests(unittest.TestCase):
 	def setUp(self):
 		self.board = Board()
 		self.board.matrix = setup_empty_matrix()
@@ -214,6 +216,58 @@ class GameLogicTests(unittest.TestCase):
 		draw_ascii_board(self.board)
 
 		self.assertCountEqual(self.board.legal_moves(tested_king_pos), [(5, 5), (6, 6)])
+
+	def test_kingHop_problem3(self):
+		tested_king_pos = (0, 6)
+		pieces = [(tested_king_pos, Piece(RED, True)),
+		          ((3, 3), Piece(BLUE)),
+		          ((2, 2), Piece(RED)),
+		          ((5, 1), Piece(RED)),
+		          ((5, 5), Piece(BLUE))]
+		set_pieces(self.board, pieces)
+		print("King hop test problem 3")
+		draw_ascii_board(self.board)
+
+		self.assertListEqual(self.board.legal_moves(tested_king_pos), [(4, 2)])
+		self.assertListEqual(self.board.legal_moves((2, 2)), [(4, 4)])
+
+
+# Tests logic in GameScene class
+class GameLogicTests(unittest.TestCase):
+	def setUp(self):
+		app = unittest.mock.MagicMock('app')
+		app.graphics = 'foo'
+		with unittest.mock.patch('game.GameRenderer'):
+			with unittest.mock.patch('utils.resources.ResourceManager'):
+				self.game = game.GameScene(app)
+
+		self.game.resource_manager = unittest.mock.MagicMock('res')
+		self.game.renderer = unittest.mock.MagicMock('renderer')
+
+		self.board = Board()
+		self.board.matrix = setup_empty_matrix()
+		self.game.board = self.board
+
+	# tests the same situation as BoardLogicTests.test_kingHop_problem3()
+	# but it also takes logic from GameScene class
+	def test_kingHop_problem3(self):
+		tested_king_pos = (0, 6)
+		pieces = [(tested_king_pos, Piece(RED, True)),
+		          ((3, 3), Piece(BLUE)),
+		          ((2, 2), Piece(RED)),
+		          ((5, 1), Piece(RED)),
+		          ((5, 5), Piece(BLUE))]
+		set_pieces(self.board, pieces)
+		draw_ascii_board(self.game.board)
+
+		self.game.turn = RED
+
+		self.assertTrue(self.game.can_anyone_hop())
+		self.assertTrue(self.game.can_hop(tested_king_pos))
+		self.assertTrue(self.game.can_hop((2, 2)))
+
+	def tearDown(self):
+		pass
 
 
 if __name__ == "__main__":

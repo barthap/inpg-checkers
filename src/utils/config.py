@@ -33,6 +33,7 @@ def get(group: str, prop: str=None) -> Any:
 	if not __loaded():
 		init()
 
+	group = group.upper()
 	if prop is None:
 		return __cfg[group]
 
