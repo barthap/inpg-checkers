@@ -155,7 +155,10 @@ class GameScene(BaseScene):
 			self.turn = BLUE if self.turn is RED else RED  # if red then blue, else RED xD
 			print("Current turn: " + ("RED" if self.turn is RED else "BLUE"))
 
-	def play_piece_sound(self, hop=False):
+	def play_piece_sound(self, hop=False) -> None:
+		if cfg.get('general').getboolean('sounds') is False:
+			return
+
 		if self.selected_square.piece.king is True:
 			if hop:
 				self.resource_manager.get_sound('king_hop.wav').play()

@@ -27,6 +27,19 @@ def init():
 	__current = str.upper(cfg.get('GENERAL', 'locale'))
 
 
+def current_language() -> str:
+	return __current
+
+
+def switch_language(new_lang: str) -> None:
+	global __current
+	if not __raw.has_section(new_lang):
+		raise NameError("Language " + new_lang + " doesn't exist in " + LOCALE_FILE)
+	__current = new_lang.upper()
+	cfg.get('general')['locale'] = new_lang
+	cfg.save()
+
+
 def get(name: str) -> str:
 	if not __loaded():
 		init()
