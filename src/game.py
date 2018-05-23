@@ -1,3 +1,7 @@
+import math
+import random
+from collections import namedtuple
+
 import pygame
 
 from utils.resources import ResourceManager
@@ -6,13 +10,23 @@ from utils.constants import *
 from graphics import Graphics
 from typing import Tuple, List, Set
 import utils.config as cfg
+import utils.locale as i18n
 
 # Type definitions
 Coords = Tuple[int, int]
 Color = Tuple[int, int, int]
 SquareMatrix = List[List['Square']]
+GameInfo = namedtuple('GameInfo', ['turn', 'time'])
 
 num_piece_rows = int(cfg.get('GENERAL', 'StartPieceRows'))
+sounds = cfg.get('general').getboolean('sounds')
+
+TEXT_X = BOARD_SIZE + 20
+
+x_center = lambda t: BOARD_SIZE + 200 / 2 - t.get_width() // 2
+
+blue_name = cfg.get('general', 'blue_name')
+red_name = cfg.get('general', 'red_name')
 
 
 # Main Game code
@@ -22,8 +36,10 @@ class GameScene(BaseScene):
 		self.renderer = GameRenderer(app.graphics)
 		self.resource_manager = ResourceManager()
 		self.board: Board = Board()
-		self.turn: Color = BLUE
 		self.selected_square: Square = None  # Board square
+
+		# Randomly select first turn
+		self.turn: Color = BLUE if bool(random.getrandbits(1)) else RED
 
 	def select_piece(self):
 		mouse_square: Square = self.mouse_in_what_square()  # just make a variable once
@@ -31,6 +47,8 @@ class GameScene(BaseScene):
 			# Somebody else can hop but not me:
 			if self.can_anyone_hop() and not self.can_hop(mouse_square.location):
 				print("Other piece can HOP!")
+				if sounds is True:
+					self.resource_manager.get_sound('err.wav').play()
 				return
 			self.update_selected(mouse_square)
 
@@ -47,6 +65,8 @@ class GameScene(BaseScene):
 				self.board[location].highlighted = True
 		else:
 			print('no legal moves')
+			if sounds is True:
+				self.resource_manager.get_sound('err2.wav').play()
 			self.deselect_piece()
 
 	def deselect_piece(self):
@@ -150,13 +170,14 @@ class GameScene(BaseScene):
 		end_game, winner = self.is_end_game()
 		if end_game is True:
 			print("END GAME,", ("RED" if winner is RED else "BLUE"), "Wins!")
-			self.resource_manager.get_sound('end_game.wav').play()
+			if sounds is True:
+				self.resource_manager.get_sound('end_game.wav').play()
 		else:
 			self.turn = BLUE if self.turn is RED else RED  # if red then blue, else RED xD
 			print("Current turn: " + ("RED" if self.turn is RED else "BLUE"))
 
 	def play_piece_sound(self, hop=False) -> None:
-		if cfg.get('general').getboolean('sounds') is False:
+		if sounds is False:
 			return
 
 		if self.selected_square.piece.king is True:
@@ -184,7 +205,9 @@ class GameScene(BaseScene):
 				else:
 					self.move_piece()
 		self.board.knight_possible()
-		self.renderer.render_screen(self.board)
+
+		game_info = GameInfo(turn=self.turn, time=1234)
+		self.renderer.render_screen(self.board, game_info)
 
 	def mouse_in_what_square(self) -> 'Square':
 		sq_pos = what_square(pygame.mouse.get_pos())
@@ -195,21 +218,86 @@ class GameRenderer:
 	def __init__(self, graphics: Graphics):
 		resource_manager = ResourceManager()
 		self.graphics = graphics
+
+		# background
 		self.bg = resource_manager.get_image('board.png')
 		self.bg_rect = self.bg.get_rect()
+
+		# pieces
 		self.red_piece = resource_manager.get_image('redpiece.png')
 		self.blue_piece = resource_manager.get_image('bluepiece.png')
 		self.blue_king = resource_manager.get_image('blueking.png')
 		self.red_king = resource_manager.get_image('redking.png')
 
+		# Sidebar
+		self.side_img = resource_manager.get_image('sidebar_bg.jpg')
+		self.side_bg = self.prepare_side_bg()
+		self.side_font = pygame.font.SysFont("tahoma", 16, True)
+		self.small_blue = pygame.transform.scale(self.blue_piece, (30, 30))
+		self.small_red = pygame.transform.scale(self.red_piece, (30, 30))
+		self.turn_text = self.side_font.render(i18n.get('turn'), True, BROWN)
+
 	def generate_bg(self) -> None:
 		self.graphics.clear_screen()
 		self.graphics.draw(self.bg, self.bg_rect)
+		self.graphics.draw(self.side_bg, (BOARD_SIZE, 0))
 
-	def render_screen(self, board: 'Board') -> None:
+	def prepare_side_bg(self) -> pygame.Surface:
+		side_bg = pygame.Surface((SCREEN_WIDTH - BOARD_SIZE, SCREEN_HEIGHT))
+		side_bg.fill(GREEN)
+
+		side_rect = side_bg.get_rect()
+		img_rect = self.side_img.get_rect()
+		sw = side_rect.w
+		sh = side_rect.h
+		iw = img_rect.w
+		ih = img_rect.h
+
+		num_horizontal = int(math.ceil(sw / iw))
+		num_vertical = int(math.ceil(sh / ih))
+		for x in range(num_horizontal):
+			for y in range(num_vertical):
+				side_bg.blit(self.side_img, pygame.Rect(x * iw, y * ih, iw, ih))
+
+		return side_bg
+
+	def render_screen(self, board: 'Board', info: GameInfo) -> None:
 		self.generate_bg()
 		self.draw_highlighted_squares(board)
 		self.draw_board_pieces(board)
+		self.draw_sidebar_info(info)
+
+	def draw_sidebar_info(self, info: GameInfo):
+		turn_name = "BLUE" if info.turn is BLUE else "RED"
+		current_turn_text = self.side_font.render(turn_name, True, info.turn)
+
+		player_color = lambda t: t if info.turn is t else BROWN
+		blue_player = self.side_font.render(blue_name, True, player_color(BLUE))
+		red_player = self.side_font.render(red_name, True, player_color(RED))
+
+		self.graphics.draw(self.turn_text, (TEXT_X, 30))
+		self.graphics.draw(current_turn_text, (TEXT_X + self.turn_text.get_width() + 5, 30))
+
+		blue_y = 115
+		red_y = 70
+
+		if info.turn is BLUE:
+			pass
+			cy = blue_y + self.small_blue.get_height()//2
+		else:
+			cy = red_y + self.small_red.get_height() // 2
+
+		pygame.draw.circle(self.graphics.screen, YELLOW, (TEXT_X+self.small_red.get_width()//2, cy),
+		                   self.small_red.get_width()//2 + 5, 5)
+
+		self.graphics.draw(self.small_blue, (TEXT_X, blue_y))
+		self.graphics.draw(self.small_red, (TEXT_X, red_y))
+
+		name_x = TEXT_X + self.small_blue.get_width() + 10
+		height_center = self.small_blue.get_height() // 2 - blue_player.get_height() // 2
+		self.graphics.draw(blue_player, (name_x, blue_y + height_center))
+		self.graphics.draw(red_player, (name_x, red_y + height_center))
+
 
 	def draw_board_pieces(self, board: 'Board') -> None:
 		for (x, y) in Board.all_board_coords():
@@ -314,8 +402,8 @@ class Board:
 	@staticmethod
 	def all_board_coords() -> Set[Coords]:
 		return {(7, 3), (1, 3), (6, 6), (7, 7), (6, 2), (5, 1), (3, 7), (2, 4), (4, 0), (3, 3), (5, 5), (4, 4), (1, 5),
-				(2, 2), (0, 4), (1, 1), (6, 4), (0, 0), (2, 6), (7, 1), (6, 0), (7, 5), (4, 2), (3, 5), (5, 3), (4, 6),
-				(3, 1), (5, 7), (0, 6), (2, 0), (1, 7), (0, 2)}
+		        (2, 2), (0, 4), (1, 1), (6, 4), (0, 0), (2, 6), (7, 1), (6, 0), (7, 5), (4, 2), (3, 5), (5, 3), (4, 6),
+		        (3, 1), (5, 7), (0, 6), (2, 0), (1, 7), (0, 2)}
 
 	def remove_all_highlights(self) -> None:
 		for x in range(8):
@@ -464,7 +552,7 @@ class Board:
 											if tile_after.piece is None:
 												hop_moves.append(tile_after_pos)
 											else:
-												if arg > 0:    # arg = 0 is hopped enemy
+												if arg > 0:  # arg = 0 is hopped enemy
 													do_break = True
 													break
 									if do_break:
