@@ -1,6 +1,8 @@
 import math
 import random
 from collections import namedtuple
+import pickle
+from copy import copy, deepcopy
 
 import pygame
 
@@ -41,6 +43,28 @@ class GameScene(BaseScene):
 		# Randomly select first turn
 		self.turn: Color = BLUE if bool(random.getrandbits(1)) else RED
 
+	def save_game(self):
+		print("Saving game...")
+		game_state = {
+			"board": self.board,
+			"turn": self.turn
+			# time
+		}
+		with open('saved_game.dat', 'wb') as file:
+			pickle.dump(game_state, file, protocol=pickle.HIGHEST_PROTOCOL)
+			print("Saved!")
+
+	def load_game(self):
+		print("Loading game...")
+		self.deselect_piece()
+		with open('saved_game.dat', 'rb') as file:
+			loaded_state = pickle.load(file)
+			board = loaded_state['board']
+			turn = loaded_state['turn']
+			self.turn = copy(turn)
+			self.board = deepcopy(board)
+			print("Game loaded successfully")
+
 	def select_piece(self):
 		mouse_square: Square = self.mouse_in_what_square()  # just make a variable once
 		if mouse_square is not None and mouse_square.piece is not None and mouse_square.piece.color == self.turn:
@@ -49,8 +73,8 @@ class GameScene(BaseScene):
 				print("Other piece can HOP!")
 				if sounds is True:
 					self.resource_manager.get_sound('err.wav').play()
-				return
-			self.update_selected(mouse_square)
+			else:
+				self.update_selected(mouse_square)
 
 	def update_selected(self, new_square: 'Square'):
 		self.selected_square = new_square
@@ -81,7 +105,7 @@ class GameScene(BaseScene):
 				print('same, deselecting')
 				self.deselect_piece()
 
-			if mouse_square is not None and mouse_square.color is BLACK and mouse_square.piece is None:
+			if mouse_square is not None and mouse_square.color == BLACK and mouse_square.piece is None:
 				if mouse_square.location in self.board.legal_moves(self.selected_square.location):
 					if self.can_hop():  # Hop an enemy
 						enemy_pos = self.board.enemy_between(self.selected_square.location, mouse_square.location)
@@ -169,12 +193,12 @@ class GameScene(BaseScene):
 	def switch_turn(self):
 		end_game, winner = self.is_end_game()
 		if end_game is True:
-			print("END GAME,", ("RED" if winner is RED else "BLUE"), "Wins!")
+			print("END GAME,", ("RED" if winner == RED else "BLUE"), "Wins!")
 			if sounds is True:
 				self.resource_manager.get_sound('end_game.wav').play()
 		else:
-			self.turn = BLUE if self.turn is RED else RED  # if red then blue, else RED xD
-			print("Current turn: " + ("RED" if self.turn is RED else "BLUE"))
+			self.turn = BLUE if self.turn == RED else RED  # if red then blue, else RED xD
+			print("Current turn: " + ("RED" if self.turn == RED else "BLUE"))
 
 	def play_piece_sound(self, hop=False) -> None:
 		if sounds is False:
@@ -198,6 +222,11 @@ class GameScene(BaseScene):
 		for event in events:
 			if event.type == pygame.KEYDOWN and (event.key == pygame.K_SPACE or event.key == pygame.K_ESCAPE):
 				self.app.switch_scene(PAUSE)
+				return
+			if event.type == pygame.KEYDOWN and (event.key == pygame.K_s):
+				self.save_game()
+			elif event.type == pygame.KEYDOWN and (event.key == pygame.K_l):
+				self.load_game()
 				return
 			if event.type == pygame.MOUSEBUTTONDOWN:
 				if self.selected_square is None:
@@ -268,10 +297,10 @@ class GameRenderer:
 		self.draw_sidebar_info(info)
 
 	def draw_sidebar_info(self, info: GameInfo):
-		turn_name = "BLUE" if info.turn is BLUE else "RED"
+		turn_name = "BLUE" if info.turn == BLUE else "RED"
 		current_turn_text = self.side_font.render(turn_name, True, info.turn)
 
-		player_color = lambda t: t if info.turn is t else BROWN
+		player_color = lambda t: t if info.turn == t else BROWN
 		blue_player = self.side_font.render(blue_name, True, player_color(BLUE))
 		red_player = self.side_font.render(red_name, True, player_color(RED))
 
@@ -281,7 +310,7 @@ class GameRenderer:
 		blue_y = 115
 		red_y = 70
 
-		if info.turn is BLUE:
+		if info.turn == BLUE:
 			pass
 			cy = blue_y + self.small_blue.get_height()//2
 		else:
@@ -470,7 +499,7 @@ class Board:
 
 		if piece is not None:
 			if piece.king is False:
-				if piece.color is BLUE:
+				if piece.color == BLUE:
 					nw_dir = self.squares_in_dir(coords, NW, 1)
 					if self.is_on_board(nw_dir) and self.get_square(nw_dir).piece is None:
 						normal_legal_moves.append(nw_dir)
@@ -478,7 +507,7 @@ class Board:
 					ne_dir = self.squares_in_dir(coords, NE, 1)
 					if self.is_on_board(ne_dir) and self.get_square(ne_dir).piece is None:
 						normal_legal_moves.append(ne_dir)
-				elif piece.color is RED:
+				elif piece.color == RED:
 					sw_dir = self.squares_in_dir(coords, SW, 1)
 					if self.is_on_board(sw_dir) and self.get_square(sw_dir).piece is None:
 						normal_legal_moves.append(sw_dir)
@@ -581,8 +610,14 @@ class Square:
 		self.location: Coords = location
 		self.highlighted: bool = False
 
+	def __str__(self):
+		return ("BLACK " if self.color == BLACK else "WHITE ") + " Square at " + str(self.location) + ", " + \
+		       ("not " if self.highlighted is False else "") + "highlighted"
 
 class Piece:
 	def __init__(self, color: Color, king=False):
 		self.color: Color = color
 		self.king: bool = king
+
+	def __str__(self):
+		return ("RED " if self.color == BLACK else "BLUE ") + ("King" if self.king else "Piece")
