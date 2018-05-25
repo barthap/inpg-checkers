@@ -8,6 +8,7 @@ from time import time
 
 import pygame
 
+from endgame import EndGameScene
 from utils.resources import ResourceManager
 from scene import BaseScene
 from utils.constants import *
@@ -26,7 +27,6 @@ num_piece_rows = int(cfg.get('GENERAL', 'StartPieceRows'))
 sounds = cfg.get('general').getboolean('sounds')
 
 TEXT_X = BOARD_SIZE + 20
-
 x_center = lambda t: BOARD_SIZE + 200 / 2 - t.get_width() // 2
 
 blue_name = cfg.get('general', 'blue_name')
@@ -41,6 +41,8 @@ class GameScene(BaseScene):
 		self.resource_manager = ResourceManager()
 		self.board: Board = Board()
 		self.selected_square: Square = None  # Board square
+		self.timer = GameTimer()
+		self.game_ended = False
 
 		# Randomly select first turn
 		self.turn: Color = BLUE if bool(random.getrandbits(1)) else RED
@@ -54,8 +56,8 @@ class GameScene(BaseScene):
 			"board": self.board,
 			"turn": self.turn,
 			"blue_name": blue_name,
-			"red_name": red_name
-			# time
+			"red_name": red_name,
+			"time": self.timer.get()
 		}
 		filename = SAVE_PATH + os.sep + "save_{}_{}_{}.dat".format(blue_name, red_name, int(time()))
 
@@ -73,6 +75,7 @@ class GameScene(BaseScene):
 			turn = loaded_state['turn']
 			blue_name = loaded_state['blue_name']
 			red_name = loaded_state['red_name']
+			self.timer.restart(int(loaded_state['time']))
 			self.turn = copy(turn)
 			self.board = deepcopy(board)
 			print("Game loaded successfully")
@@ -205,9 +208,13 @@ class GameScene(BaseScene):
 	def switch_turn(self):
 		end_game, winner = self.is_end_game()
 		if end_game is True:
+			self.game_ended = True
 			print("END GAME,", ("RED" if winner == RED else "BLUE"), "Wins!")
 			if sounds is True:
 				self.resource_manager.get_sound('end_game.wav').play()
+
+			winner_name = blue_name if winner == BLUE else red_name
+			self.app.switch_scene(END_GAME, True, (winner, winner_name))
 		else:
 			self.turn = BLUE if self.turn == RED else RED  # if red then blue, else RED xD
 			print("Current turn: " + ("RED" if self.turn == RED else "BLUE"))
@@ -237,6 +244,7 @@ class GameScene(BaseScene):
 		ctrl_held = pressed[pygame.K_LCTRL] or pressed[pygame.K_RCTRL]
 		for event in events:
 			if event.type == pygame.KEYDOWN and (event.key == pygame.K_SPACE or event.key == pygame.K_ESCAPE):
+				self.timer.pause()
 				self.app.switch_scene(PAUSE)
 				return
 			if event.type == pygame.KEYDOWN and (event.key == pygame.K_s) and ctrl_held:
@@ -251,7 +259,12 @@ class GameScene(BaseScene):
 		if self.board.knight_possible() and sounds is True:
 			self.resource_manager.get_sound('promote.wav').play()
 
-		game_info = GameInfo(turn=self.turn, time=1234)
+		if self.game_ended is True:
+			return
+
+		if self.timer.is_paused is True:
+			self.timer.resume()
+		game_info = GameInfo(turn=self.turn, time=self.timer.get())
 		self.renderer.render_screen(self.board, game_info)
 
 	def mouse_in_what_square(self) -> 'Square':
@@ -323,15 +336,20 @@ class GameRenderer:
 		turn_name = "BLUE" if info.turn == BLUE else "RED"
 		current_turn_text = self.side_font.render(turn_name, True, info.turn)
 
+		secs = info.time % 60
+		mins = (info.time - secs) // 60
+		time_text = self.side_font.render("{:02d}:{:02d}".format(mins, secs), True, BROWN)
+		self.graphics.draw(time_text, (x_center(time_text), 20))
+
 		player_color = lambda t: t if info.turn == t else BROWN
 		blue_player = self.side_font.render(blue_name, True, player_color(BLUE))
 		red_player = self.side_font.render(red_name, True, player_color(RED))
 
-		self.graphics.draw(self.turn_text, (TEXT_X, 30))
-		self.graphics.draw(current_turn_text, (TEXT_X + self.turn_text.get_width() + 5, 30))
+		self.graphics.draw(self.turn_text, (TEXT_X, 60))
+		self.graphics.draw(current_turn_text, (TEXT_X + self.turn_text.get_width() + 5, 60))
 
-		blue_y = 115
-		red_y = 70
+		blue_y = 145
+		red_y = 100
 
 		if info.turn == BLUE:
 			pass
@@ -648,3 +666,27 @@ class Piece:
 
 	def __str__(self):
 		return ("RED " if self.color == BLACK else "BLUE ") + ("King" if self.king else "Piece")
+
+
+class GameTimer:
+	def __init__(self, start_offset=0):
+		self.start_time = pygame.time.get_ticks() // 1000 - start_offset
+		self.current_time = 0
+		self.paused_time = 0
+		self.is_paused = False
+
+	def restart(self, offset=0):
+		self.start_time = pygame.time.get_ticks() // 1000 - offset
+		self.paused_time = 0
+
+	def pause(self):
+		self.paused_time = self.current_time
+		self.is_paused = True
+
+	def resume(self):
+		self.paused_time = pygame.time.get_ticks() // 1000 - self.paused_time
+		self.is_paused = False
+
+	def get(self):
+		self.current_time = pygame.time.get_ticks() // 1000 - self.start_time - self.paused_time
+		return self.current_time

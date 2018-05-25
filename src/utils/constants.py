@@ -40,6 +40,7 @@ INTRO = 'intro.IntroScene'
 MENU = 'menu.MenuScene'
 GAME = 'game.GameScene'
 PAUSE = 'pause.PauseScene'
+END_GAME = 'endgame.EndGameScene'
 
 # Config file names
 CONFIG_FILE = 'config.ini'

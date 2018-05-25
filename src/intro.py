@@ -19,7 +19,7 @@ class IntroScene(BaseScene):
 		self.app.graphics.draw(self.img, self.img_rect)
 
 		font = pygame.font.SysFont("tahoma", 24)
-		text = font.render(i18n.get('intro'), True, GREEN)
+		text = font.render(i18n.get('any_key'), True, GREEN)
 
 		# Set text coordinates
 		text_x = SCREEN_WIDTH / 2 - text.get_width() // 2
@@ -29,5 +29,5 @@ class IntroScene(BaseScene):
 
 	def update(self, events):
 		for event in events:
-			if event.type == pygame.KEYDOWN and (event.key == pygame.K_RETURN or event.key == pygame.K_SPACE):
+			if event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONDOWN:
 				self.app.switch_scene(MENU)

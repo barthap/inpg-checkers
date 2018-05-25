@@ -4,6 +4,7 @@ pyv=$( python -c 'import sys; print(sys.version_info[0])' )
 install_command = -O -m PyInstaller --onefile --noconfirm --onefile --name checkers \
  --hidden-import menu --hidden-import pause \
  --hidden-import intro --hidden-import game \
+ --hidden-import endgame \
  --windowed --distpath ./ -i icon.ico src/main.py
 
 if [ $pyv = '3' ]
