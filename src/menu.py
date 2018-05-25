@@ -245,7 +245,7 @@ class MenuScene(BaseScene):
 		                           font=pygameMenu.fonts.FONT_FRANCHISE,
 		                           menu_color_title=(120, 45, 30),
 		                           menu_color=(30, 50, 107),
-		                           title='Load game', dopause=False)
+		                           title=i18n.get('load_game'), dopause=False)
 
 	@staticmethod
 	def list_savegames() -> List[Tuple[str, str, str]]:

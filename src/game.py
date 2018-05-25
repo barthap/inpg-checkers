@@ -21,7 +21,7 @@ import utils.locale as i18n
 Coords = Tuple[int, int]
 Color = Tuple[int, int, int]
 SquareMatrix = List[List['Square']]
-GameInfo = namedtuple('GameInfo', ['turn', 'time'])
+GameInfo = namedtuple('GameInfo', ['turn', 'time', 'start_msg'])
 
 num_piece_rows = int(cfg.get('GENERAL', 'StartPieceRows'))
 sounds = cfg.get('general').getboolean('sounds')
@@ -31,6 +31,8 @@ x_center = lambda t: BOARD_SIZE + 200 / 2 - t.get_width() // 2
 
 blue_name = cfg.get('general', 'blue_name')
 red_name = cfg.get('general', 'red_name')
+
+BEGIN_MESSAGE_DURATION = 3  # in seconds
 
 
 # Main Game code
@@ -42,6 +44,7 @@ class GameScene(BaseScene):
 		self.board: Board = Board()
 		self.selected_square: Square = None  # Board square
 		self.timer = GameTimer()
+		self.begin_msg = True
 		self.game_ended = False
 
 		# Randomly select first turn
@@ -69,6 +72,7 @@ class GameScene(BaseScene):
 		global blue_name, red_name
 		print("Loading game...")
 		self.deselect_piece()
+		self.begin_msg = False
 		with open(SAVE_PATH + os.sep + filename, 'rb') as file:
 			loaded_state = pickle.load(file)
 			board = loaded_state['board']
@@ -243,7 +247,8 @@ class GameScene(BaseScene):
 		alt_held = pressed[pygame.K_LALT] or pressed[pygame.K_RALT]
 		ctrl_held = pressed[pygame.K_LCTRL] or pressed[pygame.K_RCTRL]
 		for event in events:
-			if event.type == pygame.KEYDOWN and (event.key == pygame.K_SPACE or event.key == pygame.K_ESCAPE):
+			if event.type == pygame.KEYDOWN and (event.key == pygame.K_SPACE or event.key == pygame.K_ESCAPE) \
+					and self.begin_msg is False:
 				self.timer.pause()
 				self.app.switch_scene(PAUSE)
 				return
@@ -252,6 +257,9 @@ class GameScene(BaseScene):
 			elif event.type == pygame.KEYDOWN and (event.key == pygame.K_l) and ctrl_held:
 				pass
 			if event.type == pygame.MOUSEBUTTONDOWN:
+				if self.begin_msg is True:
+					self.begin_msg = False
+					self.timer.restart()
 				if self.selected_square is None:
 					self.select_piece()
 				else:
@@ -260,11 +268,17 @@ class GameScene(BaseScene):
 			self.resource_manager.get_sound('promote.wav').play()
 
 		if self.game_ended is True:
+			self.timer.pause()
 			return
 
-		if self.timer.is_paused is True:
+		if self.timer.is_paused is True and self.begin_msg is False:
 			self.timer.resume()
-		game_info = GameInfo(turn=self.turn, time=self.timer.get())
+
+		if self.begin_msg is True and self.timer.current_time >= BEGIN_MESSAGE_DURATION:
+			self.begin_msg = False
+			self.timer.restart(0)
+
+		game_info = GameInfo(turn=self.turn, time=self.timer.get(), start_msg=self.begin_msg)
 		self.renderer.render_screen(self.board, game_info)
 
 	def mouse_in_what_square(self) -> 'Square':
@@ -294,6 +308,9 @@ class GameRenderer:
 		self.small_blue = pygame.transform.scale(self.blue_piece, (30, 30))
 		self.small_red = pygame.transform.scale(self.red_piece, (30, 30))
 		self.turn_text = self.side_font.render(i18n.get('turn'), True, BROWN)
+
+		# start game message
+		self.message_font = pygame.font.SysFont("tahoma", 48, True)
 
 	def generate_bg(self) -> None:
 		self.graphics.clear_screen()
@@ -332,13 +349,23 @@ class GameRenderer:
 		self.draw_board_pieces(board)
 		self.draw_sidebar_info(info)
 
+		if info.start_msg is True:
+			player_name = blue_name if info.turn == BLUE else red_name
+			msg_text = self.message_font.render(i18n.get('start_msg').format(player_name), True, info.turn)
+			pos_x = BOARD_SIZE/2 - msg_text.get_width()//2
+			pos_y = BOARD_SIZE/2 - msg_text.get_height()//2
+			self.graphics.draw(msg_text, (pos_x, pos_y))
+
 	def draw_sidebar_info(self, info: GameInfo):
 		turn_name = "BLUE" if info.turn == BLUE else "RED"
 		current_turn_text = self.side_font.render(turn_name, True, info.turn)
 
 		secs = info.time % 60
 		mins = (info.time - secs) // 60
-		time_text = self.side_font.render("{:02d}:{:02d}".format(mins, secs), True, BROWN)
+		if info.start_msg is True:
+			time_text = self.side_font.render("00:00", True, BROWN)
+		else:
+			time_text = self.side_font.render("{:02d}:{:02d}".format(mins, secs), True, BROWN)
 		self.graphics.draw(time_text, (x_center(time_text), 20))
 
 		player_color = lambda t: t if info.turn == t else BROWN
@@ -658,6 +685,7 @@ class Square:
 	def __str__(self):
 		return ("BLACK " if self.color == BLACK else "WHITE ") + " Square at " + str(self.location) + ", " + \
 		       ("not " if self.highlighted is False else "") + "highlighted"
+
 
 class Piece:
 	def __init__(self, color: Color, king=False):
