@@ -1,3 +1,4 @@
+import errno
 import math
 import os
 import random
@@ -62,6 +63,14 @@ class GameScene(BaseScene):
 			"red_name": red_name,
 			"time": self.timer.get()
 		}
+
+		if not os.path.exists(SAVE_PATH):
+			try:
+				os.makedirs(SAVE_PATH)
+			except OSError as e:
+				if e.errno != errno.EEXIST:
+					raise
+
 		filename = SAVE_PATH + os.sep + "save_{}_{}_{}.dat".format(blue_name, red_name, int(time()))
 
 		with open(filename, 'wb') as file:
