@@ -105,4 +105,5 @@ ENV/
 .idea/
 idea/
 
-saved_game.dat
+# game
+saves/*

@@ -1,8 +1,10 @@
 import math
+import os
 import random
 from collections import namedtuple
 import pickle
 from copy import copy, deepcopy
+from time import time
 
 import pygame
 
@@ -33,7 +35,7 @@ red_name = cfg.get('general', 'red_name')
 
 # Main Game code
 class GameScene(BaseScene):
-	def __init__(self, app: 'App'):
+	def __init__(self, app: 'App', load_name=None):
 		super().__init__(app)
 		self.renderer = GameRenderer(app.graphics)
 		self.resource_manager = ResourceManager()
@@ -43,24 +45,34 @@ class GameScene(BaseScene):
 		# Randomly select first turn
 		self.turn: Color = BLUE if bool(random.getrandbits(1)) else RED
 
+		if load_name is not None:
+			self.load_game(load_name)
+
 	def save_game(self):
 		print("Saving game...")
 		game_state = {
 			"board": self.board,
-			"turn": self.turn
+			"turn": self.turn,
+			"blue_name": blue_name,
+			"red_name": red_name
 			# time
 		}
-		with open('saved_game.dat', 'wb') as file:
+		filename = SAVE_PATH + os.sep + "save_{}_{}_{}.dat".format(blue_name, red_name, int(time()))
+
+		with open(filename, 'wb') as file:
 			pickle.dump(game_state, file, protocol=pickle.HIGHEST_PROTOCOL)
 			print("Saved!")
 
-	def load_game(self):
+	def load_game(self, filename):
+		global blue_name, red_name
 		print("Loading game...")
 		self.deselect_piece()
-		with open('saved_game.dat', 'rb') as file:
+		with open(SAVE_PATH + os.sep + filename, 'rb') as file:
 			loaded_state = pickle.load(file)
 			board = loaded_state['board']
 			turn = loaded_state['turn']
+			blue_name = loaded_state['blue_name']
+			red_name = loaded_state['red_name']
 			self.turn = copy(turn)
 			self.board = deepcopy(board)
 			print("Game loaded successfully")
@@ -219,21 +231,25 @@ class GameScene(BaseScene):
 		pass
 
 	def update(self, events):
+		pressed = pygame.key.get_pressed()
+
+		alt_held = pressed[pygame.K_LALT] or pressed[pygame.K_RALT]
+		ctrl_held = pressed[pygame.K_LCTRL] or pressed[pygame.K_RCTRL]
 		for event in events:
 			if event.type == pygame.KEYDOWN and (event.key == pygame.K_SPACE or event.key == pygame.K_ESCAPE):
 				self.app.switch_scene(PAUSE)
 				return
-			if event.type == pygame.KEYDOWN and (event.key == pygame.K_s):
+			if event.type == pygame.KEYDOWN and (event.key == pygame.K_s) and ctrl_held:
 				self.save_game()
-			elif event.type == pygame.KEYDOWN and (event.key == pygame.K_l):
-				self.load_game()
-				return
+			elif event.type == pygame.KEYDOWN and (event.key == pygame.K_l) and ctrl_held:
+				pass
 			if event.type == pygame.MOUSEBUTTONDOWN:
 				if self.selected_square is None:
 					self.select_piece()
 				else:
 					self.move_piece()
-		self.board.knight_possible()
+		if self.board.knight_possible() and sounds is True:
+			self.resource_manager.get_sound('promote.wav').play()
 
 		game_info = GameInfo(turn=self.turn, time=1234)
 		self.renderer.render_screen(self.board, game_info)
@@ -260,8 +276,8 @@ class GameRenderer:
 
 		# Sidebar
 		self.side_img = resource_manager.get_image('sidebar_bg.jpg')
-		self.side_bg = self.prepare_side_bg()
 		self.side_font = pygame.font.SysFont("tahoma", 16, True)
+		self.side_bg = self.prepare_side_bg()
 		self.small_blue = pygame.transform.scale(self.blue_piece, (30, 30))
 		self.small_red = pygame.transform.scale(self.red_piece, (30, 30))
 		self.turn_text = self.side_font.render(i18n.get('turn'), True, BROWN)
@@ -287,6 +303,13 @@ class GameRenderer:
 		for x in range(num_horizontal):
 			for y in range(num_vertical):
 				side_bg.blit(self.side_img, pygame.Rect(x * iw, y * ih, iw, ih))
+
+		info_text = self.side_font.render(i18n.get('pause_info'), True, BROWN)
+		# load_text = self.side_font.render(i18n.get('load_info'), True, BROWN)
+		save_text = self.side_font.render(i18n.get('save_info'), True, BROWN)
+		side_bg.blit(info_text, (20, SCREEN_HEIGHT - 30))
+		side_bg.blit(save_text, (20, SCREEN_HEIGHT - 35 - info_text.get_height()))
+		# side_bg.blit(save_text, (20, SCREEN_HEIGHT - 40 - 2*load_text.get_height()))
 
 		return side_bg
 
@@ -591,16 +614,20 @@ class Board:
 
 		return hop_moves
 
-	def knight_possible(self):
+	def knight_possible(self) -> bool:
+		somebody_promoted = False
 		for x in range(8):
 			for y in range(7, 8):
 				piece: Piece = self.matrix[x][y].piece
-				if piece is not None and piece.color == RED:
+				if piece is not None and piece.color == RED and piece.king is False:
 					piece.king = True
+					somebody_promoted = True
 			for y in range(1):
 				piece: Piece = self.matrix[x][y].piece
-				if piece is not None and piece.color == BLUE:
+				if piece is not None and piece.color == BLUE and piece.king is False:
 					piece.king = True
+					somebody_promoted = True
+		return somebody_promoted
 
 
 class Square:

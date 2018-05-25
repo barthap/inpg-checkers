@@ -12,6 +12,7 @@ SCREEN_HEIGHT = 600
 RESOURCE_PATH = "resources"     # relative path to resource folder
 IMAGE_PATH = "img"              # image folder name (inside resources)
 SOUND_PATH = "sfx"
+SAVE_PATH = "saves"
 
 # Constants used in gameplay
 BOARD_SIZE = 600   # Window width and height

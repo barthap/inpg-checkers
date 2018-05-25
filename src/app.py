@@ -1,4 +1,5 @@
 import sys
+from typing import Any
 
 import pygame
 
@@ -36,8 +37,8 @@ class App:
 		self.__running = False  # Break main loop
 
 	# Function to change states, etc Intro -> Menu, Menu -> Game etc.
-	def switch_scene(self, new_scene: str, reload: bool=False):
-		self.scene_manager.go(new_scene, reload)
+	def switch_scene(self, new_scene: str, reload: bool=False, arg: Any=None):
+		self.scene_manager.go(new_scene, reload, arg)
 
 	# Methods and attributes which names start with __ (double underscore) are Private
 

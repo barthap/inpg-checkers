@@ -1,3 +1,4 @@
+import codecs
 import configparser as cp
 from typing import Any
 
@@ -50,7 +51,8 @@ def get(name: str) -> str:
 def __create_from_file() -> cp.ConfigParser:
 	print("Loading locale from ", LOCALE_FILE)
 	cfg = cp.ConfigParser()
-	cfg.read(LOCALE_FILE)
+	#cfg.read(LOCALE_FILE)
+	cfg.read_file(codecs.open(LOCALE_FILE, 'r', 'utf8'))
 	return cfg
 
 
