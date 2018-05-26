@@ -1,0 +1,9 @@
+Essence of the game
+
+Checkers is a two-player game with each player possessing 12 checkers, of either blue or red. The objective is to capture the opponent's checkers or
+immobilize them.
+
+
+The board
+
+The board consists of 64 tiles being an 8x8 grid where checkers are primarily located as displayed at the beginning of the game.
