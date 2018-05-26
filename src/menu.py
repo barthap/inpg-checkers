@@ -101,6 +101,16 @@ class MenuScene(BaseScene):
 
 		HELP.close()
 
+
+		authors_path = RESOURCE_PATH + os.sep + i18n.get('authors_filename')
+		AUTHORS = open(authors_path, "r")
+
+		for line in AUTHORS:
+			self.authors_menu.add_line(line)  # Add line
+		self.authors_menu.add_option(i18n.get('return_to_menu'), PYGAME_MENU_BACK)  # Add option
+
+		AUTHORS.close()
+
 	def update(self, events):
 		self.menu.mainloop(events)
 		self.help_menu.main1(events)
