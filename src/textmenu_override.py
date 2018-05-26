@@ -197,10 +197,13 @@ class supermenu(pygameMenu.TextMenu):
 		else:
 			self._text.append(text)
 		self.pages_count = math.ceil(len(self._text) / self.lines_per_page)
-		self.set_title(
-			self.default_title_str + " " + i18n.get('page') + ": {actual_page}/{pages_count}".format(actual_page=self.actual_page + 1,
-			                                                                     pages_count=self.pages_count),
-			self._title_offsetx, self._title_offsety)
+		if self.pages_count < 2:
+			self.set_title(self.default_title_str, self._title_offsetx, self._title_offsety)
+		else:
+			self.set_title(
+				self.default_title_str + " " + i18n.get('page') + ": {actual_page}/{pages_count}".format(actual_page=self.actual_page + 1,
+																			pages_count=self.pages_count),
+				self._title_offsetx, self._title_offsety)
 
 	def main1(self, events=None):
 		for event in events:

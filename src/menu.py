@@ -97,6 +97,9 @@ class MenuScene(BaseScene):
 		self.menu.add_option(i18n.get('exit'), self.app.exit)  # Add exit function
 
 		self.settings_menu.add_option(i18n.get('return_to_menu'), PYGAME_MENU_BACK)
+		self.settings_menu.add_option(i18n.get('return_to_menu'), PYGAME_MENU_BACK)
+		self.settings_menu.add_option(i18n.get('return_to_menu'), PYGAME_MENU_BACK)
+		self.settings_menu.add_option(i18n.get('return_to_menu'), PYGAME_MENU_BACK)
 
 
 		self.prepare_load_menu()
