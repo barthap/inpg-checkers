@@ -39,6 +39,29 @@ class MenuScene(BaseScene):
 		                                     font=pygameMenu.fonts.FONT_NEVIS,
 		                                     title=i18n.get('checkers_count'), bgfun=None, dopause=False)
 
+		self.settings_sound_menu = pygameMenu.Menu(app.graphics.screen, window_width=SCREEN_WIDTH,
+		                                                    window_height=SCREEN_HEIGHT,
+		                                                    menu_width=SCREEN_WIDTH, menu_height=SCREEN_HEIGHT,
+		                                                    font=pygameMenu.fonts.FONT_NEVIS,
+		                                                    title=i18n.get('sound'), bgfun=None, dopause=False)
+
+		self.settings_language_menu = pygameMenu.Menu(app.graphics.screen, window_width=SCREEN_WIDTH,
+		                                           window_height=SCREEN_HEIGHT,
+		                                           menu_width=SCREEN_WIDTH, menu_height=SCREEN_HEIGHT,
+		                                           font=pygameMenu.fonts.FONT_NEVIS,
+		                                           title=i18n.get('language'), bgfun=None, dopause=False)
+
+		self.settings_players_names_menu = pygameMenu.Menu(app.graphics.screen, window_width=SCREEN_WIDTH,
+		                                              window_height=SCREEN_HEIGHT,
+		                                              menu_width=SCREEN_WIDTH, menu_height=SCREEN_HEIGHT,
+		                                              font=pygameMenu.fonts.FONT_NEVIS,
+		                                              title=i18n.get('Players_Names'), bgfun=None, dopause=False)
+		self.settings_game_time_menu = pygameMenu.Menu(app.graphics.screen, window_width=SCREEN_WIDTH,
+		                                                   window_height=SCREEN_HEIGHT,
+		                                                   menu_width=SCREEN_WIDTH, menu_height=SCREEN_HEIGHT,
+		                                                   font=pygameMenu.fonts.FONT_NEVIS,
+		                                                   title=i18n.get('game_time'), bgfun=None, dopause=False)
+
 		# Show the rules
 		self.help_menu = supermenu(app.graphics.screen, window_width=SCREEN_WIDTH, window_height=SCREEN_HEIGHT,
 									menu_width=SCREEN_WIDTH, menu_height=SCREEN_HEIGHT,
@@ -104,13 +127,34 @@ class MenuScene(BaseScene):
 		self.menu.add_option(i18n.get('exit'), self.app.exit)  # Add exit function
 
 		self.settings_menu.add_option(i18n.get('checkers_count'), self.settings_checkers_count_menu)
-		self.settings_menu.add_option(i18n.get('checkers_count'), self.settings_checkers_count_menu)
+		self.settings_menu.add_option(i18n.get('sound'), self.settings_sound_menu)
+		self.settings_menu.add_option(i18n.get('language'), self.settings_language_menu)
+		self.settings_menu.add_option(i18n.get('Players_Names'), self.settings_language_menu)
+		self.settings_menu.add_option(i18n.get('game_time'), self.settings_game_time_menu)
 		self.settings_menu.add_option(i18n.get('return_to_menu'), self.settings_menu_out)
 		self.settings_menu.disable()
 
 		self.settings_checkers_count_menu.add_option(i18n.get('2_rows'), PYGAME_MENU_BACK)
 		self.settings_checkers_count_menu.add_option(i18n.get('3_rows'), PYGAME_MENU_BACK)
 		self.settings_checkers_count_menu.add_option(i18n.get('return_to_menu'), PYGAME_MENU_BACK)
+
+		self.settings_sound_menu.add_option(i18n.get('on'), PYGAME_MENU_BACK)
+		self.settings_sound_menu.add_option(i18n.get('off'), PYGAME_MENU_BACK)
+		self.settings_sound_menu.add_option(i18n.get('return_to_menu'), PYGAME_MENU_BACK)
+
+		self.settings_language_menu.add_option(i18n.get('Polish'), PYGAME_MENU_BACK)
+		self.settings_language_menu.add_option(i18n.get('English'), PYGAME_MENU_BACK)
+		self.settings_language_menu.add_option(i18n.get('return_to_menu'), PYGAME_MENU_BACK)
+
+		self.settings_players_names_menu.add_option(i18n.get('Polish'), PYGAME_MENU_BACK)
+		self.settings_players_names_menu.add_option(i18n.get('English'), PYGAME_MENU_BACK)
+		self.settings_players_names_menu.add_option(i18n.get('return_to_menu'), PYGAME_MENU_BACK)
+
+		self.settings_game_time_menu.add_option('30 ' + i18n.get('seconds'), PYGAME_MENU_BACK)
+		self.settings_game_time_menu.add_option('60 ' + i18n.get('seconds'), PYGAME_MENU_BACK)
+		self.settings_game_time_menu.add_option('120 ' + i18n.get('seconds'), PYGAME_MENU_BACK)
+		self.settings_game_time_menu.add_option('240 ' + i18n.get('seconds'), PYGAME_MENU_BACK)
+		self.settings_game_time_menu.add_option(i18n.get('return_to_menu'), PYGAME_MENU_BACK)
 
 		self.prepare_load_menu()
 
