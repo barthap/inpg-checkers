@@ -99,18 +99,18 @@ class MenuScene(BaseScene):
 		self.menu.add_option(i18n.get('new_game'), self.__go_play)  # Add timer submenu
 		self.menu.add_option(i18n.get('load_game'), self.load_menu)
 		self.menu.add_option(i18n.get('rules'), self.help_menu)
-		self.menu.add_option(i18n.get('settings'), self.settings_menu)
+		self.menu.add_option(i18n.get('settings'), self.settings_menu_in)
 		self.menu.add_option(i18n.get('authors'), self.authors_menu)
 		self.menu.add_option(i18n.get('exit'), self.app.exit)  # Add exit function
 
-		self.settings_menu.add_option(i18n.get('checkers_count'), self.settings_checkers_count_menu_in)
-		self.settings_menu.add_option(i18n.get('checkers_count'), self.settings_checkers_count_menu_in)
-		self.settings_menu.add_option(i18n.get('return_to_menu'), PYGAME_MENU_BACK)
+		self.settings_menu.add_option(i18n.get('checkers_count'), self.settings_checkers_count_menu)
+		self.settings_menu.add_option(i18n.get('checkers_count'), self.settings_checkers_count_menu)
+		self.settings_menu.add_option(i18n.get('return_to_menu'), self.settings_menu_out)
+		self.settings_menu.disable()
 
-		self.settings_checkers_count_menu.add_option(i18n.get('2_rows'), self.settings_checkers_count_menu_2rows_out)
-		self.settings_checkers_count_menu.add_option(i18n.get('3_rows'),  self.settings_checkers_count_menu_3rows_out)
-		self.settings_checkers_count_menu.add_option(i18n.get('return_to_menu'),  self.settings_checkers_count_menu_out)
-		self.settings_checkers_count_menu_out()
+		self.settings_checkers_count_menu.add_option(i18n.get('2_rows'), PYGAME_MENU_BACK)
+		self.settings_checkers_count_menu.add_option(i18n.get('3_rows'), PYGAME_MENU_BACK)
+		self.settings_checkers_count_menu.add_option(i18n.get('return_to_menu'), PYGAME_MENU_BACK)
 
 		self.prepare_load_menu()
 
@@ -138,26 +138,19 @@ class MenuScene(BaseScene):
 		if(self.menu.is_enabled()):
 			self.menu.mainloop(events)
 			self.help_menu.main1(events)
-		elif(self.settings_checkers_count_menu.is_enabled()):
-			self.settings_checkers_count_menu.mainloop(events)
+		elif(self.settings_menu.is_enabled()):
+			self.settings_menu.mainloop(events)
 
 
-	def settings_checkers_count_menu_in(self):
+
+	def settings_menu_in(self):
 		self.menu.disable()
-		self.settings_checkers_count_menu.enable()
+		self.settings_menu.enable()
 
-	def settings_checkers_count_menu_out(self):
+	def settings_menu_out(self):
 		self.menu.enable()
-		self.settings_checkers_count_menu.disable()
+		self.settings_menu.disable()
 
-	def settings_checkers_count_menu_2rows_out(self):
-
-		self.menu.enable()
-		self.settings_checkers_count_menu.disable()
-
-	def settings_checkers_count_menu_3rows_out(self):
-		self.menu.enable()
-		self.settings_checkers_count_menu.disable()
 
 	def __go_play(self, load_filename=None):
 		self.app.switch_scene(GAME, True, load_filename)
