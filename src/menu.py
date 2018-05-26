@@ -103,14 +103,15 @@ class MenuScene(BaseScene):
 		self.menu.add_option(i18n.get('authors'), self.authors_menu)
 		self.menu.add_option(i18n.get('exit'), self.app.exit)  # Add exit function
 
-		self.settings_menu.add_option(i18n.get('checkers_count'), self.settings_checkers_count_menu_shit)
-		self.settings_menu.add_option(i18n.get('checkers_count'), PYGAME_MENU_BACK)
+		self.settings_menu.add_option(i18n.get('checkers_count'), self.settings_checkers_count_menu_in)
+		self.settings_menu.add_option(i18n.get('checkers_count'), self.settings_checkers_count_menu_in)
 		self.settings_menu.add_option(i18n.get('return_to_menu'), PYGAME_MENU_BACK)
 
-		self.settings_checkers_count_menu.add_option(i18n.get('2_rows'), self.settings_checkers_count_menu_unshit)
-		self.settings_checkers_count_menu.add_option(i18n.get('3_rows'),  self.settings_checkers_count_menu_unshit)
-		self.settings_checkers_count_menu.add_option(i18n.get('return_to_menu'),  self.settings_checkers_count_menu_unshit)
-		self.settings_checkers_count_menu_unshit()
+		self.settings_checkers_count_menu.add_option(i18n.get('2_rows'), self.settings_checkers_count_menu_2rows_out)
+		self.settings_checkers_count_menu.add_option(i18n.get('3_rows'),  self.settings_checkers_count_menu_3rows_out)
+		self.settings_checkers_count_menu.add_option(i18n.get('return_to_menu'),  self.settings_checkers_count_menu_out)
+		self.settings_checkers_count_menu_out()
+
 		self.prepare_load_menu()
 
 		rules_path = RESOURCE_PATH + os.sep + i18n.get('rules_filename')
@@ -139,15 +140,25 @@ class MenuScene(BaseScene):
 			self.help_menu.main1(events)
 		elif(self.settings_checkers_count_menu.is_enabled()):
 			self.settings_checkers_count_menu.mainloop(events)
-	def settings_checkers_count_menu_shit(self):
-		print(self,"shit")
+
+
+	def settings_checkers_count_menu_in(self):
 		self.menu.disable()
 		self.settings_checkers_count_menu.enable()
 
-	def settings_checkers_count_menu_unshit(self):
-		print(self,"unshit")
+	def settings_checkers_count_menu_out(self):
+		self.menu.enable()
+		self.settings_checkers_count_menu.disable()
+
+	def settings_checkers_count_menu_2rows_out(self):
+
+		self.menu.enable()
+		self.settings_checkers_count_menu.disable()
+
+	def settings_checkers_count_menu_3rows_out(self):
 		self.menu.enable()
 		self.settings_checkers_count_menu.disable()
 
 	def __go_play(self, load_filename=None):
 		self.app.switch_scene(GAME, True, load_filename)
+
