@@ -28,6 +28,10 @@ class MenuScene(BaseScene):
 									font=pygameMenu.fonts.FONT_NEVIS,
 									title=i18n.get('main_menu'), bgfun=None, dopause=False)
 
+		self.settings_menu= pygameMenu.Menu(app.graphics.screen, window_width=SCREEN_WIDTH, window_height=SCREEN_HEIGHT,
+		                            menu_width=SCREEN_WIDTH, menu_height=SCREEN_HEIGHT,
+		                            font=pygameMenu.fonts.FONT_NEVIS,
+		                            title=i18n.get('settings'), bgfun=None, dopause=False)
 		# Show the rules
 		self.help_menu = supermenu(app.graphics.screen, window_width=SCREEN_WIDTH, window_height=SCREEN_HEIGHT,
 									menu_width=SCREEN_WIDTH, menu_height=SCREEN_HEIGHT,
@@ -88,8 +92,11 @@ class MenuScene(BaseScene):
 		self.menu.add_option(i18n.get('new_game'), self.__go_play)  # Add timer submenu
 		self.menu.add_option(i18n.get('load_game'), self.load_menu)
 		self.menu.add_option(i18n.get('rules'), self.help_menu)
+		self.menu.add_option(i18n.get('settings'), self.settings_menu)
 		self.menu.add_option(i18n.get('authors'), self.authors_menu)
 		self.menu.add_option(i18n.get('exit'), self.app.exit)  # Add exit function
+
+		self.settings_menu.add_option(i18n.get('return_to_menu'), PYGAME_MENU_BACK)
 
 
 		self.prepare_load_menu()
