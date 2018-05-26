@@ -32,6 +32,13 @@ class MenuScene(BaseScene):
 		                            menu_width=SCREEN_WIDTH, menu_height=SCREEN_HEIGHT,
 		                            font=pygameMenu.fonts.FONT_NEVIS,
 		                            title=i18n.get('settings'), bgfun=None, dopause=False)
+
+		self.settings_checkers_count_menu = pygameMenu.Menu(app.graphics.screen, window_width=SCREEN_WIDTH,
+		                                     window_height=SCREEN_HEIGHT,
+		                                     menu_width=SCREEN_WIDTH, menu_height=SCREEN_HEIGHT,
+		                                     font=pygameMenu.fonts.FONT_NEVIS,
+		                                     title=i18n.get('checkers_count'), bgfun=None, dopause=False)
+
 		# Show the rules
 		self.help_menu = supermenu(app.graphics.screen, window_width=SCREEN_WIDTH, window_height=SCREEN_HEIGHT,
 									menu_width=SCREEN_WIDTH, menu_height=SCREEN_HEIGHT,
@@ -96,12 +103,14 @@ class MenuScene(BaseScene):
 		self.menu.add_option(i18n.get('authors'), self.authors_menu)
 		self.menu.add_option(i18n.get('exit'), self.app.exit)  # Add exit function
 
-		self.settings_menu.add_option(i18n.get('return_to_menu'), PYGAME_MENU_BACK)
-		self.settings_menu.add_option(i18n.get('return_to_menu'), PYGAME_MENU_BACK)
-		self.settings_menu.add_option(i18n.get('return_to_menu'), PYGAME_MENU_BACK)
+		self.settings_menu.add_option(i18n.get('checkers_count'), self.settings_checkers_count_menu_shit)
+		self.settings_menu.add_option(i18n.get('checkers_count'), PYGAME_MENU_BACK)
 		self.settings_menu.add_option(i18n.get('return_to_menu'), PYGAME_MENU_BACK)
 
-
+		self.settings_checkers_count_menu.add_option(i18n.get('2_rows'), self.settings_checkers_count_menu_unshit)
+		self.settings_checkers_count_menu.add_option(i18n.get('3_rows'),  self.settings_checkers_count_menu_unshit)
+		self.settings_checkers_count_menu.add_option(i18n.get('return_to_menu'),  self.settings_checkers_count_menu_unshit)
+		self.settings_checkers_count_menu_unshit()
 		self.prepare_load_menu()
 
 		rules_path = RESOURCE_PATH + os.sep + i18n.get('rules_filename')
@@ -124,8 +133,21 @@ class MenuScene(BaseScene):
 		AUTHORS.close()
 
 	def update(self, events):
-		self.menu.mainloop(events)
-		self.help_menu.main1(events)
+		self.app.graphics.clear_screen()
+		if(self.menu.is_enabled()):
+			self.menu.mainloop(events)
+			self.help_menu.main1(events)
+		elif(self.settings_checkers_count_menu.is_enabled()):
+			self.settings_checkers_count_menu.mainloop(events)
+	def settings_checkers_count_menu_shit(self):
+		print(self,"shit")
+		self.menu.disable()
+		self.settings_checkers_count_menu.enable()
+
+	def settings_checkers_count_menu_unshit(self):
+		print(self,"unshit")
+		self.menu.enable()
+		self.settings_checkers_count_menu.disable()
 
 	def __go_play(self, load_filename=None):
 		self.app.switch_scene(GAME, True, load_filename)
