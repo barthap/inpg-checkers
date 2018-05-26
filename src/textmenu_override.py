@@ -38,6 +38,7 @@ class supermenu(pygameMenu.TextMenu):
 		text = self._actual._fonttext.render("A", 1, self._actual._font_textcolor)
 		text_width_char = text.get_size()[0]
 		text_height_char = self._actual._font_textsize
+
 		self.char_per_line = (self._width) // (text_width_char)
 		self.text_width_char = text_width_char
 		self.lines_per_page = (self._height - math.ceil(
@@ -65,9 +66,15 @@ class supermenu(pygameMenu.TextMenu):
 			text = self._actual._fonttext.render(linea, 1,
 			                                     self._actual._font_textcolor)
 
+			if self._centered_text:
+				text_width = text.get_size()[0]
+				text_dx = (self.char_per_line*self.text_width_char/2)-int(text_width / 2.0 + self._actual._pos_text_x)
+			else:
+				text_dx = 0
+
 			ycoords = self._actual._title_rect[4][1] + self._actual._textdy + dy * (
 				self._actual._font_textsize)
-			self._surface.blit(text, (self._actual._pos_text_x,
+			self._surface.blit(text, (self._actual._pos_text_x + text_dx,
 			                          ycoords))
 			dy += 1
 

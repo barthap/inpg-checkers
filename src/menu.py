@@ -42,9 +42,11 @@ class MenuScene(BaseScene):
 		                           menu_width=SCREEN_WIDTH, menu_height=SCREEN_HEIGHT,
 		                           font=pygameMenu.fonts.FONT_FRANCHISE,
 		                           onclose=PYGAME_MENU_DISABLE_CLOSE,
+                                   text_centered = True,
 		                           title=i18n.get('authors'), dopause=False,
 		                           menu_color_title=(120, 45, 30),
 		                           menu_color=(30, 50, 107),
+		                           text_fontsize=40,
 		                           button_region_y=50)
 
 		self.load_menu = pygameMenu.Menu(app.graphics.screen, window_width=SCREEN_WIDTH, window_height=SCREEN_HEIGHT,
