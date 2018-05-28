@@ -1,0 +1,7 @@
+
+Bartlomiej Klocek
+Rafal Ogorek
+Filip Frey
+Michal Knap
+
+Z wykorzystaniem pygame-menu autorstwa ppizarror
