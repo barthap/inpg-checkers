@@ -1,7 +1,7 @@
 
-Bartlomiej Klocek
-Rafal Ogorek
+Bart³omiej Klocek
+Rafa³ Ogórek
 Filip Frey
-Michal Knap
+Micha³ Knap
 
 Using ppizarror's pygame-menu
