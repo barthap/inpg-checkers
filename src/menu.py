@@ -1,3 +1,5 @@
+import pygame
+
 from textmenu_override import supermenu
 import os
 from datetime import datetime
@@ -17,6 +19,9 @@ from utils.constants import SAVE_PATH
 
 
 # Main Menu scene
+from utils.text import TextInput
+
+
 class MenuScene(BaseScene):
 	def __init__(self, app):
 		super().__init__(app)
@@ -89,6 +94,8 @@ class MenuScene(BaseScene):
 		                           menu_color=(30, 50, 107),
 		                           title=i18n.get('load_game'), dopause=False)
 
+		self.init()
+
 	@staticmethod
 	def list_savegames() -> List[Tuple[str, str, str]]:
 		f = []
@@ -107,7 +114,7 @@ class MenuScene(BaseScene):
 
 	def prepare_load_menu(self):
 		save_list = self.list_savegames()
-		for save in save_list:
+		for save in save_list[-7:]:
 			timestamp = float(save[2])
 			dt = datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S')
 			title = "{} vs {}, {}".format(save[0], save[1], dt)
@@ -115,7 +122,7 @@ class MenuScene(BaseScene):
 
 		self.load_menu.add_option(i18n.get('return_to_menu'), PYGAME_MENU_BACK)
 
-	def setup(self):
+	def init(self):
 		self.app.graphics.clear_screen()
 
 		sound_opts = [(i18n.get('on'), 'yes'),  # 0th option
@@ -141,7 +148,7 @@ class MenuScene(BaseScene):
 		                                onreturn=None, onchange=self.__change_sound, default=default_sound)
 
 		self.settings_menu.add_option(i18n.get('language'), self.settings_language_menu)
-		self.settings_menu.add_option(i18n.get('Players_Names'), self.settings_language_menu)
+		self.settings_menu.add_option(i18n.get('Players_Names'), self.settings_players_names_menu)
 		self.settings_menu.add_option(i18n.get('game_time'), self.settings_game_time_menu)
 		self.settings_menu.add_option(i18n.get('return_to_menu'), self.settings_menu_out)
 		self.settings_menu.disable()
@@ -154,8 +161,9 @@ class MenuScene(BaseScene):
 		self.settings_language_menu.add_option(i18n.get('English'), PYGAME_MENU_BACK)
 		self.settings_language_menu.add_option(i18n.get('return_to_menu'), PYGAME_MENU_BACK)
 
-		self.settings_players_names_menu.add_option(i18n.get('Polish'), PYGAME_MENU_BACK)
-		self.settings_players_names_menu.add_option(i18n.get('English'), PYGAME_MENU_BACK)
+		# TODO: ADD TRANSLATIONS HERE
+		self.settings_players_names_menu.add_option('BLUE', self.__change_player, BLUE)
+		self.settings_players_names_menu.add_option('RED', self.__change_player, RED)
 		self.settings_players_names_menu.add_option(i18n.get('return_to_menu'), PYGAME_MENU_BACK)
 
 		self.settings_game_time_menu.add_option('30 ' + i18n.get('seconds'), PYGAME_MENU_BACK)
@@ -186,10 +194,10 @@ class MenuScene(BaseScene):
 
 	def update(self, events):
 		self.app.graphics.clear_screen()
-		if(self.menu.is_enabled()):
+		if self.menu.is_enabled():
 			self.menu.mainloop(events)
 			self.help_menu.main1(events)
-		elif(self.settings_menu.is_enabled()):
+		elif self.settings_menu.is_enabled():
 			self.settings_menu.mainloop(events)
 
 	def settings_menu_in(self):
@@ -203,6 +211,12 @@ class MenuScene(BaseScene):
 	def __go_play(self, load_filename=None):
 		self.app.switch_scene(GAME, True, load_filename)
 
+	def __change_player(self, color):
+		name_opt = 'blue_name' if color == BLUE else 'red_name'
+		player_name = config.get('general', name_opt)
+		scene = PlayerNamesScene(self.app, player_name, color)
+		self.app.scene_manager.go_once(scene)
+
 	@staticmethod
 	def __change_sound(opt):
 		cfg = config.get('general')
@@ -215,3 +229,37 @@ class MenuScene(BaseScene):
 		cfg['startpiecerows'] = opt
 		config.save()
 
+
+class PlayerNamesScene(BaseScene):
+	def __init__(self, app, name, color):
+		super().__init__(app)
+		self.nameString = name
+		self.color = color
+		self.textInput = TextInput(default_text=name, text_color=color, font_family="comicsansms", cursor_color=color)
+
+	def update(self, events):
+		font = pygame.font.SysFont("tahoma", 32)
+		text = font.render('Enter player name', True, WHITE)    # TODO: ADD TRANSLATION HERE!
+		self.app.graphics.clear_screen()
+		self.app.graphics.draw(text, (10, 10))
+
+		for event in events:
+			if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+				self.save()
+				return
+			if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+				self.back()
+				return
+
+		self.textInput.update(events)
+		self.app.graphics.draw(self.textInput.get_surface(), (10, 50))
+
+	def save(self):
+		name_opt = 'blue_name' if self.color == BLUE else 'red_name'
+		cfg = config.get('general')
+		cfg[name_opt] = self.textInput.get_text()
+		config.save()
+		self.app.switch_scene(MENU, False)
+
+	def back(self):
+		self.app.switch_scene(MENU, False)

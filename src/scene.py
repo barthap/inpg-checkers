@@ -51,3 +51,10 @@ class SceneManager:
 			self.current.destroy()
 		self.current = self.get_scene_object(new_scene, reload, arg)
 		self.current.setup()
+
+	def go_once(self, scene_object):
+		assert isinstance(scene_object, BaseScene)
+		if self.current is not None:
+			self.current.destroy()
+		self.current = scene_object
+		self.current.setup()
