@@ -21,7 +21,9 @@ from utils.constants import SAVE_PATH
 # Main Menu scene
 from utils.text import TextInput
 
-
+__actualpath = str(os.path.abspath(
+    os.path.dirname(__file__))).replace('\\', '/')
+__fontdir = '{0}/fonts/{1}.ttf'
 class MenuScene(BaseScene):
 	def __init__(self, app):
 		super().__init__(app)
@@ -29,47 +31,48 @@ class MenuScene(BaseScene):
 		# Main Menu
 		self.menu = pygameMenu.Menu(app.graphics.screen, window_width=SCREEN_WIDTH, window_height=SCREEN_HEIGHT,
 									menu_width=SCREEN_WIDTH, menu_height=SCREEN_HEIGHT,
-									font=pygameMenu.fonts.FONT_NEVIS,
+									font=FONT_MENU,
 									title=i18n.get('main_menu'), bgfun=None, dopause=False)
 
 		self.settings_menu= pygameMenu.Menu(app.graphics.screen, window_width=SCREEN_WIDTH, window_height=SCREEN_HEIGHT,
 		                            menu_width=SCREEN_WIDTH, menu_height=SCREEN_HEIGHT,
-		                            font=pygameMenu.fonts.FONT_NEVIS,
+		                            font=FONT_MENU,
 		                            title=i18n.get('settings'), bgfun=None, dopause=False)
 
 		self.settings_checkers_count_menu = pygameMenu.Menu(app.graphics.screen, window_width=SCREEN_WIDTH,
 		                                     window_height=SCREEN_HEIGHT,
 		                                     menu_width=SCREEN_WIDTH, menu_height=SCREEN_HEIGHT,
-		                                     font=pygameMenu.fonts.FONT_NEVIS,
+		                                     font=FONT_MENU,
 		                                     title=i18n.get('checkers_count'), bgfun=None, dopause=False)
 
 		self.settings_sound_menu = pygameMenu.Menu(app.graphics.screen, window_width=SCREEN_WIDTH,
 		                                                    window_height=SCREEN_HEIGHT,
 		                                                    menu_width=SCREEN_WIDTH, menu_height=SCREEN_HEIGHT,
-		                                                    font=pygameMenu.fonts.FONT_NEVIS,
+		                                                    font=FONT_MENU,
 		                                                    title=i18n.get('sound'), bgfun=None, dopause=False)
 
 		self.settings_language_menu = pygameMenu.Menu(app.graphics.screen, window_width=SCREEN_WIDTH,
 		                                           window_height=SCREEN_HEIGHT,
 		                                           menu_width=SCREEN_WIDTH, menu_height=SCREEN_HEIGHT,
-		                                           font=pygameMenu.fonts.FONT_NEVIS,
+		                                           font=FONT_MENU,
 		                                           title=i18n.get('language'), bgfun=None, dopause=False)
 
 		self.settings_players_names_menu = pygameMenu.Menu(app.graphics.screen, window_width=SCREEN_WIDTH,
 		                                              window_height=SCREEN_HEIGHT,
 		                                              menu_width=SCREEN_WIDTH, menu_height=SCREEN_HEIGHT,
-		                                              font=pygameMenu.fonts.FONT_NEVIS,
+		                                              font=FONT_MENU,
 		                                              title=i18n.get('Players_Names'), bgfun=None, dopause=False)
 		self.settings_game_time_menu = pygameMenu.Menu(app.graphics.screen, window_width=SCREEN_WIDTH,
 		                                                   window_height=SCREEN_HEIGHT,
 		                                                   menu_width=SCREEN_WIDTH, menu_height=SCREEN_HEIGHT,
-		                                                   font=pygameMenu.fonts.FONT_NEVIS,
+		                                                   font=FONT_MENU,
 		                                                   title=i18n.get('game_time'), bgfun=None, dopause=False)
 
 		# Show the rules
 		self.help_menu = supermenu(app.graphics.screen, window_width=SCREEN_WIDTH, window_height=SCREEN_HEIGHT,
 									menu_width=SCREEN_WIDTH, menu_height=SCREEN_HEIGHT,
-									font=pygameMenu.fonts.FONT_FRANCHISE,
+									font=FONT_TEXT,
+                                    font_title=FONT_MENU,
 									onclose=PYGAME_MENU_DISABLE_CLOSE,
 									title=i18n.get('rules_title'), dopause=False,
 									menu_color_title=(120, 45, 30),
@@ -78,7 +81,8 @@ class MenuScene(BaseScene):
 
 		self.authors_menu = supermenu(app.graphics.screen, window_width=SCREEN_WIDTH, window_height=SCREEN_HEIGHT,
 		                           menu_width=SCREEN_WIDTH, menu_height=SCREEN_HEIGHT,
-		                           font=pygameMenu.fonts.FONT_FRANCHISE,
+		                           font=FONT_TEXT,
+		                           font_title=FONT_MENU,
 		                           onclose=PYGAME_MENU_DISABLE_CLOSE,
                                    text_centered = True,
 		                           title=i18n.get('authors'), dopause=False,
@@ -89,7 +93,7 @@ class MenuScene(BaseScene):
 
 		self.load_menu = pygameMenu.Menu(app.graphics.screen, window_width=SCREEN_WIDTH, window_height=SCREEN_HEIGHT,
 		                           menu_width=SCREEN_WIDTH, menu_height=SCREEN_HEIGHT,
-		                           font=pygameMenu.fonts.FONT_FRANCHISE,
+		                           font=FONT_TEXT,
 		                           menu_color_title=(120, 45, 30),
 		                           menu_color=(30, 50, 107),
 		                           title=i18n.get('load_game'), dopause=False)
@@ -168,7 +172,7 @@ class MenuScene(BaseScene):
 		self.prepare_load_menu()
 
 		rules_path = RESOURCE_PATH + os.sep + i18n.get('rules_filename')
-		HELP = open(rules_path, "r")
+		HELP = open(rules_path, "r",encoding='utf-8')
 
 		for line in HELP:
 			self.help_menu.add_line(line)  # Add line
@@ -177,7 +181,7 @@ class MenuScene(BaseScene):
 		HELP.close()
 
 		authors_path = RESOURCE_PATH + os.sep + i18n.get('authors_filename')
-		AUTHORS = open(authors_path, "r")
+		AUTHORS = open(authors_path, "r",encoding='utf-8')
 
 		for line in AUTHORS:
 			self.authors_menu.add_line(line)  # Add line

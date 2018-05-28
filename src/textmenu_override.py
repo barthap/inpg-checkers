@@ -5,6 +5,7 @@ import pygameMenu.config_menu as _cfg_menu
 import math
 import pygameMenu  # This imports classes and other things
 from pygameMenu.locals import *  # Import constants (like actions)
+from utils.constants import *  # Import constants (like actions)
 import utils.locale as i18n
 
 class supermenu(pygameMenu.TextMenu):
@@ -35,8 +36,8 @@ class supermenu(pygameMenu.TextMenu):
 			**kwargs)
 		self.pages_count = 0
 		self.actual_page = 0
-		text = self._actual._fonttext.render("A", 1, self._actual._font_textcolor)
-		text_width_char = text.get_size()[0]
+		text = self._actual._fonttext.render(LOREM_IPSUM,text_fontsize, self._actual._font_textcolor)
+		text_width_char = math.ceil(text.get_size()[0]/LOREM_IPSUM.__len__())
 		text_height_char = self._actual._font_textsize
 
 		self.char_per_line = (self._width) // (text_width_char)
