@@ -1,63 +1,54 @@
 
 Esencja gry
 
-Warcaby to dwuosobowa gra, w której ka¿dy gracz posiada po 12 pionków koloru niebieskiego b¹dŸ
-czerwonego. Celem jest zbicie pionków przeciwnika lub ich unieruchomienie.
+Warcaby to dwuosobowa gra, w ktÃ³rej kaÅ¼dy gracz posiada po 12 pionkÃ³w koloru niebieskiego bÄ…dÅº czerwonego. Celem jest zbicie pionkÃ³w przeciwnika lub ich unieruchomienie.
 
 
 Plansza
 
-Plansza sk³ada siê z 64 kwadratów tworz¹cych obszar 8x8, gdzie pionki s¹ pocz¹tkowo
-rozmieszczone jak jest to pokazane na pocz¹tku gry.
+Plansza skÅ‚ada siÄ™ z 64 kwadratÃ³w tworzÄ…cych obszar 8x8, gdzie pionki sÄ… poczÄ…tkowo rozmieszczone jak jest to pokazane na poczÄ…tku gry.
 
 
-Pocz¹tek gry
+PoczÄ…tek gry
 
-Pierwszy poruszaj¹cy siê gracz jest wybierany losowo. Potem ka¿dy gracz dysponuje jedn¹ tur¹,
-której nie mo¿na pomin¹æ.
+Pierwszy poruszajÄ…cy siÄ™ gracz jest wybierany losowo. Potem kaÅ¼dy gracz dysponuje jednÄ… turÄ…, ktÃ³rej nie moÅ¼na pominÄ…Ä‡.
 
 
-Jak graæ
+Jak graÄ‡
 
-Gracz mo¿e ruszaæ swoim pionkiem do przodu na nastêpne wolne pole po przek¹tnej
+Gracz moÅ¼e ruszaÄ‡ swoim pionkiem do przodu na nastÄ™pne wolne pole po przekÄ…tnej
 
 Zbicie
 
-Zbicie, jeœli mo¿liwe, jest obowi¹zkowym ruchem do wykonania. Gdy pole po przek¹tnej do pionka
-gracza w jakimkolwiek kierunku jest zajête, oraz gdy nastêpne pole jest puste, gracz musi
-przeskoczyæ, czyli zbiæ pionek przeciwnik¹, l¹duj¹c przy tym na wspomnianym pustym polu, co
-skutkuje usuniêciem zbitego pionka z gry.
+Zbicie, jeÅ›li moÅ¼liwe, jest obowiÄ…zkowym ruchem do wykonania. Gdy pole po przekÄ…tnej do pionka gracza w jakimkolwiek kierunku jest zajÄ™te, oraz gdy nastÄ™pne pole jest puste, gracz musi przeskoczyÄ‡, czyli zbiÄ‡ pionek przeciwnikÄ…, lÄ…dujÄ…c przy tym na wspomnianym pustym polu, co skutkuje usuniÄ™ciem zbitego pionka z gry.
 
 Wielokrotne zbicia
 
-Po zbiciu, jeœli pionek znowu ma mo¿liwoœæ zbicia, musi je wykonaæ, co stanowi czêœæ jednej 
-tury. Gdy wystêpuje kilka mo¿liwych œcie¿ek zbicia, gracz ma dowolnoœæ w ich wyborze.
+Po zbiciu, jeÅ›li pionek znowu ma moÅ¼liwoÅ›Ä‡ zbicia, musi je wykonaÄ‡, co stanowi czÄ™Å›Ä‡ jednej tury. Gdy wystÄ™puje kilka moÅ¼liwych Å›cieÅ¼ek zbicia, gracz ma dowolnoÅ›Ä‡ w ich wyborze.
+
 
 Damka
 
-Gdy pionek dotrze do ostatniego rzêdu na planszy, za pomoc¹ ruchu lub zbicia, stajê sie on 
-damk¹, co koñczy turê. Damka mo¿e wykonaæ ruch albo zbicie w dowolnym kierunku po przek¹tnej,
-o jedno pole lub wiêcej. Damka ma mo¿liwoœæ zbicia tylko jednego pionka naraz, skacz¹c na 
-dowolne puste pole za nim. Wielokrotne zbicia tak¿e funkcjonuj¹ dla damek.
+Gdy pionek dotrze do ostatniego rzÄ™du na planszy, za pomocÄ… ruchu lub zbicia, stajÄ™ sie on damkÄ…, co koÅ„czy turÄ™. Damka moÅ¼e wykonaÄ‡ ruch albo zbicie w dowolnym kierunku po przekÄ…tnej, o jedno pole lub wiÄ™cej. Damka ma moÅ¼liwoÅ›Ä‡ zbicia tylko jednego pionka naraz, skaczÄ…c na dowolne puste pole za nim. Wielokrotne zbicia takÅ¼e funkcjonujÄ… dla damek.
 
 Ograniczenia czasowe
 
-1 tura mo¿e trwaæ do 2 i pó³ minuty, po czym gracz jest zmuszony do poddania gry jeœli nie wykona³ ¿adnej czynnoœci albo nie zd¹¿y³ jej skoñczyæ.
+1 tura moÅ¼e trwaÄ‡ do 2 i pÃ³Å‚ minuty, po czym gracz jest zmuszony do poddania gry jeÅ›li nie wykonaÅ‚ Å¼adnej czynnoÅ›ci albo nie zdÄ…Å¼yÅ‚ jej skoÅ„czyÄ‡.
 
-Warunki zakoñczenia gry
 
-Wygrana 
 
-Grê uznaje siê za wygran¹, jeœli:
 
-Gracz zbi³ pionki przeciwnika,
-Gracz unieruchomi³ pionki przeciwnika,
-Przeciwnik podda³ grê
 
-Przegrana
 
-Gra jest przegrana jeœli gracz nie jest w stanie kontynuowaæ gry w ¿aden sposób.
 
-Remis
+Warunki zakoÅ„czenia gry
 
-Gra skutkuje remisem gdy ¿adne zbicie ani promocja do damki nie zachodzi w ci¹gu 30 ruchów.
+GrÄ™ uznaje siÄ™ za wygranÄ…, jeÅ›li:
+
+ + Gracz zbiÅ‚ pionki przeciwnika,
+ + Gracz unieruchomiÅ‚ pionki przeciwnika,
+ + Przeciwnik poddaÅ‚ grÄ™
+
+Gra jest przegrana jeÅ›li gracz nie jest w stanie kontynuowaÄ‡ gry w Å¼aden sposÃ³b.
+
+Gra skutkuje remisem gdy Å¼adne zbicie ani promocja do damki nie zachodzi w ciÄ…gu 30 ruchÃ³w.

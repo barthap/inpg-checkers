@@ -1,7 +1,7 @@
 
-Bart≥omiej Klocek
-Rafa≥ OgÛrek
+Bart≈Çomiej Klocek
+Rafa≈Ç Og√≥rek
 Filip Frey
-Micha≥ Knap
+Micha≈Ç Knap
 
 Using ppizarror's pygame-menu

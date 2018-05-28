@@ -48,7 +48,7 @@ LOCALE_FILE = 'locale.ini'
 
 # Fonts
 __fontdir = "{0}/{1}.ttf"
-FONT_TEXT = __fontdir.format("src/fonts", 'Slabo27px-Regular')
-FONT_MENU = __fontdir.format("src/fonts", 'Raleway-ExtraBold')
+FONT_TEXT = __fontdir.format("resources/fonts", 'Slabo27px-Regular')
+FONT_MENU = __fontdir.format("resources/fonts", 'Raleway-ExtraBold')
 
 LOREM_IPSUM="Go home Textmenu, You`re drunk."
