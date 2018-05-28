@@ -11,13 +11,12 @@ from utils.constants import *
 from scene import BaseScene
 
 import utils.locale as i18n
+import utils.config as config
 from os import walk
 from utils.constants import SAVE_PATH
 
+
 # Main Menu scene
-
-
-
 class MenuScene(BaseScene):
 	def __init__(self, app):
 		super().__init__(app)
@@ -119,6 +118,16 @@ class MenuScene(BaseScene):
 	def setup(self):
 		self.app.graphics.clear_screen()
 
+		sound_opts = [(i18n.get('on'), 'yes'),  # 0th option
+		              (i18n.get('off'), 'no')]  # 1st option
+		# if sounds is yes, default option is 0th, else 1st
+		default_sound = 0 if config.get('general', 'sounds') == 'yes' else 1
+
+		checkers_count_opts = [(i18n.get('2_rows'), '2'),
+		                       (i18n.get('3_rows'), '3')]
+		default_rows = 0 if config.get('general', 'startpiecerows') == '2' else 1
+
+
 		self.menu.add_option(i18n.get('new_game'), self.__go_play)  # Add timer submenu
 		self.menu.add_option(i18n.get('load_game'), self.load_menu)
 		self.menu.add_option(i18n.get('rules'), self.help_menu)
@@ -126,8 +135,11 @@ class MenuScene(BaseScene):
 		self.menu.add_option(i18n.get('authors'), self.authors_menu)
 		self.menu.add_option(i18n.get('exit'), self.app.exit)  # Add exit function
 
-		self.settings_menu.add_option(i18n.get('checkers_count'), self.settings_checkers_count_menu)
-		self.settings_menu.add_option(i18n.get('sound'), self.settings_sound_menu)
+		self.settings_menu.add_selector(i18n.get('checkers_count'), checkers_count_opts,
+		                                onreturn=None, onchange=self.__change_checkers_rows, default=default_rows)
+		self.settings_menu.add_selector(i18n.get('sound'), sound_opts,
+		                                onreturn=None, onchange=self.__change_sound, default=default_sound)
+
 		self.settings_menu.add_option(i18n.get('language'), self.settings_language_menu)
 		self.settings_menu.add_option(i18n.get('Players_Names'), self.settings_language_menu)
 		self.settings_menu.add_option(i18n.get('game_time'), self.settings_game_time_menu)
@@ -137,10 +149,6 @@ class MenuScene(BaseScene):
 		self.settings_checkers_count_menu.add_option(i18n.get('2_rows'), PYGAME_MENU_BACK)
 		self.settings_checkers_count_menu.add_option(i18n.get('3_rows'), PYGAME_MENU_BACK)
 		self.settings_checkers_count_menu.add_option(i18n.get('return_to_menu'), PYGAME_MENU_BACK)
-
-		self.settings_sound_menu.add_option(i18n.get('on'), PYGAME_MENU_BACK)
-		self.settings_sound_menu.add_option(i18n.get('off'), PYGAME_MENU_BACK)
-		self.settings_sound_menu.add_option(i18n.get('return_to_menu'), PYGAME_MENU_BACK)
 
 		self.settings_language_menu.add_option(i18n.get('Polish'), PYGAME_MENU_BACK)
 		self.settings_language_menu.add_option(i18n.get('English'), PYGAME_MENU_BACK)
@@ -167,7 +175,6 @@ class MenuScene(BaseScene):
 
 		HELP.close()
 
-
 		authors_path = RESOURCE_PATH + os.sep + i18n.get('authors_filename')
 		AUTHORS = open(authors_path, "r")
 
@@ -185,8 +192,6 @@ class MenuScene(BaseScene):
 		elif(self.settings_menu.is_enabled()):
 			self.settings_menu.mainloop(events)
 
-
-
 	def settings_menu_in(self):
 		self.menu.disable()
 		self.settings_menu.enable()
@@ -195,7 +200,18 @@ class MenuScene(BaseScene):
 		self.menu.enable()
 		self.settings_menu.disable()
 
-
 	def __go_play(self, load_filename=None):
 		self.app.switch_scene(GAME, True, load_filename)
+
+	@staticmethod
+	def __change_sound(opt):
+		cfg = config.get('general')
+		cfg['sounds'] = opt
+		config.save()
+
+	@staticmethod
+	def __change_checkers_rows(opt):
+		cfg = config.get('general')
+		cfg['startpiecerows'] = opt
+		config.save()
 
