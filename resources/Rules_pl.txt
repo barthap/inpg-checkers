@@ -1,8 +1,7 @@
 
 Esencja gry
 
-Checkers is a two-player game with each player possessing 12 checkers, of either blue or red. The objective is to capture the opponent's checkers or
-immobilize them.
+Checkers is a two-player game with each player possessing 12 checkers, of either blue or red. The objective is to capture the opponent's checkers or immobilize them.
 
 
 Plansza

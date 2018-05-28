@@ -36,9 +36,10 @@ class supermenu(pygameMenu.TextMenu):
 			**kwargs)
 		self.pages_count = 0
 		self.actual_page = 0
-		text = self._actual._fonttext.render(LOREM_IPSUM,text_fontsize, self._actual._font_textcolor)
-		text_width_char = math.ceil(text.get_size()[0]/LOREM_IPSUM.__len__())
-		text_height_char = self._actual._font_textsize
+		text = self._actual._fonttext.render(LOREM_IPSUM,1, self._actual._font_textcolor)
+		text_width_char =math.ceil(text.get_size()[0]/len(LOREM_IPSUM))
+		#He is still drunk, but at least he is home
+		text_height_char = text.get_size()[1]
 
 		self.char_per_line = (self._width) // (text_width_char)
 		self.text_width_char = text_width_char
@@ -190,9 +191,12 @@ class supermenu(pygameMenu.TextMenu):
 			sliced_text_1 = text[:self.char_per_line]
 			sliced_text_2 = text[self.char_per_line:]
 
-			if (sliced_text_1[-1].isalpha()):
-				sliced_text_2 = sliced_text_1[-1] + sliced_text_2
-				sliced_text_1 = sliced_text_1[:-1] + '-'
+			i=-1
+			while(sliced_text_1[i].isalpha()):
+				i-=1;
+			sliced_text_2=sliced_text_1[self.char_per_line+i:self.char_per_line]+sliced_text_2
+			sliced_text_1=sliced_text_1[:self.char_per_line+i]
+
 			self._text.append(sliced_text_1)
 			self.add_line(sliced_text_2)
 		else:
