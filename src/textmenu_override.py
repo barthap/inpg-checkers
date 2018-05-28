@@ -192,7 +192,7 @@ class supermenu(pygameMenu.TextMenu):
 			sliced_text_2 = text[self.char_per_line:]
 
 			i=-1
-			while(sliced_text_1[i].isalpha()):
+			while(not sliced_text_1[i].isspace()):
 				i-=1;
 			sliced_text_2=sliced_text_1[self.char_per_line+i:self.char_per_line]+sliced_text_2
 			sliced_text_1=sliced_text_1[:self.char_per_line+i]
