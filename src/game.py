@@ -30,10 +30,11 @@ sounds = cfg.get('general').getboolean('sounds')
 TEXT_X = BOARD_SIZE + 20
 x_center = lambda t: BOARD_SIZE + 200 / 2 - t.get_width() // 2
 
-blue_name = cfg.get('general', 'blue_name')
-red_name = cfg.get('general', 'red_name')
-
 BEGIN_MESSAGE_DURATION = 3  # in seconds
+
+# it is later read from config / loaded savegame
+blue_name = 'BLUE'
+red_name = 'RED'
 
 
 # Main Game code
@@ -47,6 +48,10 @@ class GameScene(BaseScene):
 		self.timer = GameTimer()
 		self.begin_msg = True
 		self.game_ended = False
+
+		global blue_name, red_name
+		blue_name = cfg.get('general', 'blue_name')
+		red_name = cfg.get('general', 'red_name')
 
 		# Randomly select first turn
 		self.turn: Color = BLUE if bool(random.getrandbits(1)) else RED
