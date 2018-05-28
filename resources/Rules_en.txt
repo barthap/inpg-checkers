@@ -33,9 +33,7 @@ If a checker reaches the last rank on the board, either by a move or a jump, it 
 
 
 
-Time restrictions
 
-1 turn can last for up to 2 and a half minutes, after which a player is forced to forfeit the game if either he has not done anything or did not finish a turn.
 
 Conditions of Ending
 
@@ -45,7 +43,7 @@ Win
 The game is won, if: 
 
 The player has captured the opponent's checkers,
-The player has rendered the the opponent immobilized,
+The player has rendered the opponent immobilized,
 The opponent has declared defeat
 
 Loss

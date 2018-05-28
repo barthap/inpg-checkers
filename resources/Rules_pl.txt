@@ -1,58 +1,63 @@
 
 Esencja gry
 
-Checkers is a two-player game with each player possessing 12 checkers, of either blue or red. The objective is to capture the opponent's checkers or immobilize them.
+Warcaby to dwuosobowa gra, w której ka¿dy gracz posiada po 12 pionków koloru niebieskiego b¹dŸ
+czerwonego. Celem jest zbicie pionków przeciwnika lub ich unieruchomienie.
 
 
 Plansza
 
-The board consists of 64 tiles being an 8x8 grid where checkers are primarily located as displayed at the beginning of the game.
+Plansza sk³ada siê z 64 kwadratów tworz¹cych obszar 8x8, gdzie pionki s¹ pocz¹tkowo
+rozmieszczone jak jest to pokazane na pocz¹tku gry.
 
 
-RozpoczÄ™cie gry
+Pocz¹tek gry
 
-The first player to move is determined randomly. Then each player takes a single turn, which cannot be skipped whatsoever.
-
-
-Jak graÄ‡
+Pierwszy poruszaj¹cy siê gracz jest wybierany losowo. Potem ka¿dy gracz dysponuje jedn¹ tur¹,
+której nie mo¿na pomin¹æ.
 
 
-A player can move his checker forward diagonally to a free tile 1 tile at a time.
+Jak graæ
 
-Capture
+Gracz mo¿e ruszaæ swoim pionkiem do przodu na nastêpne wolne pole po przek¹tnej
 
-Making a "jump" or capture is mandatory if possible. When a tile diagonal to the player's checker in any direction is occupied, and when a tile further is empty, the player must "jump" over the rival's checker and land on the empty tile, which results in the opponent's checker being removed from the game.
+Zbicie
 
-Multiple captures
+Zbicie, jeœli mo¿liwe, jest obowi¹zkowym ruchem do wykonania. Gdy pole po przek¹tnej do pionka
+gracza w jakimkolwiek kierunku jest zajête, oraz gdy nastêpne pole jest puste, gracz musi
+przeskoczyæ, czyli zbiæ pionek przeciwnik¹, l¹duj¹c przy tym na wspomnianym pustym polu, co
+skutkuje usuniêciem zbitego pionka z gry.
 
-Whenever, after a jump, a checker is able to jump again, it has to - all in the same turn. Whenever presented with a multitude of jump opportunities, the player is able to choose a specific jumping path (multiple or not).
+Wielokrotne zbicia
 
-The King
+Po zbiciu, jeœli pionek znowu ma mo¿liwoœæ zbicia, musi je wykonaæ, co stanowi czêœæ jednej 
+tury. Gdy wystêpuje kilka mo¿liwych œcie¿ek zbicia, gracz ma dowolnoœæ w ich wyborze.
 
-If a checker reaches the last rank on the board, either by a move or a jump, it becomes a king, and that completes the turn. A king can move, or jump, in any diagonal direction, 1 or more tiles per turn. A king can only jump over 1 checker at a time, to any empty tile behind it. Multiple jumps are applicable to kings too.
+Damka
 
+Gdy pionek dotrze do ostatniego rzêdu na planszy, za pomoc¹ ruchu lub zbicia, stajê sie on 
+damk¹, co koñczy turê. Damka mo¿e wykonaæ ruch albo zbicie w dowolnym kierunku po przek¹tnej,
+o jedno pole lub wiêcej. Damka ma mo¿liwoœæ zbicia tylko jednego pionka naraz, skacz¹c na 
+dowolne puste pole za nim. Wielokrotne zbicia tak¿e funkcjonuj¹ dla damek.
 
+Ograniczenia czasowe
 
-Time restrictions
+1 tura mo¿e trwaæ do 2 i pó³ minuty, po czym gracz jest zmuszony do poddania gry jeœli nie wykona³ ¿adnej czynnoœci albo nie zd¹¿y³ jej skoñczyæ.
 
-1 turn can last for up to 2 and a half minutes, after which a player is forced to forfeit the game if either he has not done anything or did not finish a turn.
+Warunki zakoñczenia gry
 
-Conditions of Ending
+Wygrana 
 
+Grê uznaje siê za wygran¹, jeœli:
 
-Win
+Gracz zbi³ pionki przeciwnika,
+Gracz unieruchomi³ pionki przeciwnika,
+Przeciwnik podda³ grê
 
-The game is won, if: 
+Przegrana
 
-The player has captured the opponent's checkers,
-The player has rendered the the opponent immobilized,
-The opponent has declared defeat
+Gra jest przegrana jeœli gracz nie jest w stanie kontynuowaæ gry w ¿aden sposób.
 
-Loss
+Remis
 
-The game is lost if a player is unable to continue the game in any manner.
-
-Draw
-
-The game results in a draw when no capture or promotion to king happens in 30 consecutive moves.
-
+Gra skutkuje remisem gdy ¿adne zbicie ani promocja do damki nie zachodzi w ci¹gu 30 ruchów.
