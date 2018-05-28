@@ -137,6 +137,7 @@ class MenuScene(BaseScene):
 		lang_opts = [('English', 'english'),
 		              ('Polski', 'polish')]
 
+
 		default_lang = 0 if config.get('general', 'locale') == 'english' else 1
 
 
@@ -154,29 +155,15 @@ class MenuScene(BaseScene):
 		self.settings_menu.add_selector(i18n.get('language'), lang_opts,
 		                                onreturn=self.__change_lang, onchange=None, default=default_lang)
 
+
 		self.settings_menu.add_option(i18n.get('Players_Names'), self.settings_players_names_menu)
-		self.settings_menu.add_option(i18n.get('game_time'), self.settings_game_time_menu)
 		self.settings_menu.add_option(i18n.get('return_to_menu'), self.settings_menu_out)
 		self.settings_menu.disable()
 
-		self.settings_checkers_count_menu.add_option(i18n.get('2_rows'), PYGAME_MENU_BACK)
-		self.settings_checkers_count_menu.add_option(i18n.get('3_rows'), PYGAME_MENU_BACK)
-		self.settings_checkers_count_menu.add_option(i18n.get('return_to_menu'), PYGAME_MENU_BACK)
-
-		self.settings_language_menu.add_option(i18n.get('Polish'), PYGAME_MENU_BACK)
-		self.settings_language_menu.add_option(i18n.get('English'), PYGAME_MENU_BACK)
-		self.settings_language_menu.add_option(i18n.get('return_to_menu'), PYGAME_MENU_BACK)
-
-		# TODO: ADD TRANSLATIONS HERE
 		self.settings_players_names_menu.add_option('BLUE', self.__change_player, BLUE)
 		self.settings_players_names_menu.add_option('RED', self.__change_player, RED)
 		self.settings_players_names_menu.add_option(i18n.get('return_to_menu'), PYGAME_MENU_BACK)
 
-		self.settings_game_time_menu.add_option('30 ' + i18n.get('seconds'), PYGAME_MENU_BACK)
-		self.settings_game_time_menu.add_option('60 ' + i18n.get('seconds'), PYGAME_MENU_BACK)
-		self.settings_game_time_menu.add_option('120 ' + i18n.get('seconds'), PYGAME_MENU_BACK)
-		self.settings_game_time_menu.add_option('240 ' + i18n.get('seconds'), PYGAME_MENU_BACK)
-		self.settings_game_time_menu.add_option(i18n.get('return_to_menu'), PYGAME_MENU_BACK)
 
 		self.prepare_load_menu()
 
@@ -231,7 +218,9 @@ class MenuScene(BaseScene):
 
 	def __change_lang(self, opt):
 		i18n.switch_language(opt)
+		config.save()
 		self.app.switch_scene(MENU, True)
+
 
 	@staticmethod
 	def __change_checkers_rows(opt):
