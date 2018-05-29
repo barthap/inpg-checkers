@@ -34,10 +34,9 @@ def current_language() -> str:
 
 def switch_language(new_lang: str) -> None:
 	global __current
-	new_lang = str.upper(new_lang)
-	if not __raw.has_section(new_lang):
+	if not __raw.has_section(new_lang.upper()):
 		raise NameError("Language " + new_lang + " doesn't exist in " + LOCALE_FILE)
-	__current = new_lang
+	__current = new_lang.upper()
 	cfg.get('general')['locale'] = new_lang
 	cfg.save()
 

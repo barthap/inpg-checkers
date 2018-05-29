@@ -399,7 +399,7 @@ class GameRenderer:
 			cy = red_y + self.small_red.get_height() // 2
 
 		pygame.draw.circle(self.graphics.screen, YELLOW, (TEXT_X+self.small_red.get_width()//2, cy),
-		                   self.small_red.get_width()//2 + 5, 5)
+		                   self.small_red.get_width() // 2 + 5, 5)
 
 		self.graphics.draw(self.small_blue, (TEXT_X, blue_y))
 		self.graphics.draw(self.small_red, (TEXT_X, red_y))

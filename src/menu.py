@@ -132,7 +132,7 @@ class MenuScene(BaseScene):
 		sound_opts = [(i18n.get('on'), 'yes'),  # 0th option
 		              (i18n.get('off'), 'no')]  # 1st option
 		# if sounds is yes, default option is 0th, else 1st
-		default_sound = 0 if config.get('general', 'sounds') == 'yes' else 1
+		default_sound = 0 if config.get('general', 'sounds').lower() == 'yes' else 1
 
 		checkers_count_opts = [(i18n.get('2_rows'), '2'),
 		                       (i18n.get('3_rows'), '3')]
@@ -141,8 +141,7 @@ class MenuScene(BaseScene):
 		lang_opts = [('English', 'english'),
 		              ('Polski', 'polish')]
 
-
-		default_lang = 0 if config.get('general', 'locale') == 'english' else 1
+		default_lang = 0 if config.get('general', 'locale').lower() == 'english' else 1
 
 
 		self.menu.add_option(i18n.get('new_game'), self.__go_play)  # Add timer submenu
