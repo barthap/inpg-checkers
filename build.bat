@@ -1,3 +1,4 @@
+@echo off
 cd /D "%~dp0"
 Title Build checkers
 set "MISSING_PYINSTALLER=true"
@@ -36,3 +37,4 @@ IF "%choice%"=="file" (
 )
 
 echo Finished building game! Your executable is in 'dist' directory
+pause

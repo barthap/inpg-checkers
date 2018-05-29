@@ -3,7 +3,8 @@
 # Constant names should be UPPER_CASE
 
 # App general config
-WINDOW_TITLE: str = "Checkers !"
+APP_VERSION: str = 'v1.0'
+WINDOW_TITLE: str = "Checkers! " + APP_VERSION
 
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600

@@ -1,3 +1,4 @@
+Checkers v1.0
 
 Bartłomiej Klocek
 Rafał Ogórek
