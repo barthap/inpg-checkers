@@ -1,4 +1,5 @@
 @echo off
+cd /D "%~dp0"
 Title INPG Checkers
 set "MISSING_PYTHON=true"
 where python > NUL 2>&1 && set "MISSING_PYTHON=false"

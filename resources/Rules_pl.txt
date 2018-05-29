@@ -1,0 +1,54 @@
+
+Esencja gry
+
+Warcaby to dwuosobowa gra, w której każdy gracz posiada po 12 pionków koloru niebieskiego bądź czerwonego. Celem jest zbicie pionków przeciwnika lub ich unieruchomienie.
+
+
+Plansza
+
+Plansza składa się z 64 kwadratów tworzących obszar 8x8, gdzie pionki są początkowo rozmieszczone jak jest to pokazane na początku gry.
+
+
+Początek gry
+
+Pierwszy poruszający się gracz jest wybierany losowo. Potem każdy gracz dysponuje jedną turą, której nie można pominąć.
+
+
+Jak grać
+
+Gracz może ruszać swoim pionkiem do przodu na następne wolne pole po przekątnej
+
+Zbicie
+
+Zbicie, jeśli możliwe, jest obowiązkowym ruchem do wykonania. Gdy pole po przekątnej do pionka gracza w jakimkolwiek kierunku jest zajęte, oraz gdy następne pole jest puste, gracz musi przeskoczyć, czyli zbić pionek przeciwniką, lądując przy tym na wspomnianym pustym polu, co skutkuje usunięciem zbitego pionka z gry.
+
+Wielokrotne zbicia
+
+Po zbiciu, jeśli pionek znowu ma możliwość zbicia, musi je wykonać, co stanowi część jednej tury. Gdy występuje kilka możliwych ścieżek zbicia, gracz ma dowolność w ich wyborze.
+
+
+Damka
+
+Gdy pionek dotrze do ostatniego rzędu na planszy, za pomocą ruchu lub zbicia, staję sie on damką, co kończy turę. Damka może wykonać ruch albo zbicie w dowolnym kierunku po przekątnej, o jedno pole lub więcej. Damka ma możliwość zbicia tylko jednego pionka naraz, skacząc na dowolne puste pole za nim. Wielokrotne zbicia także funkcjonują dla damek.
+
+Ograniczenia czasowe
+
+1 tura może trwać do 2 i pół minuty, po czym gracz jest zmuszony do poddania gry jeśli nie wykonał żadnej czynności albo nie zdążył jej skończyć.
+
+
+
+
+
+
+
+Warunki zakończenia gry
+
+Grę uznaje się za wygraną, jeśli:
+
+ + Gracz zbił pionki przeciwnika,
+ + Gracz unieruchomił pionki przeciwnika,
+ + Przeciwnik poddał grę
+
+Gra jest przegrana jeśli gracz nie jest w stanie kontynuować gry w żaden sposób.
+
+Gra skutkuje remisem gdy żadne zbicie ani promocja do damki nie zachodzi w ciągu 30 ruchów.

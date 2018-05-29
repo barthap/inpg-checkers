@@ -1,16 +1,21 @@
-from typing import Type
+import sys
+from typing import Any
 
 import pygame
 
 from graphics import Graphics
-from constants import *
-from resources import ResourceManager
+from utils.constants import *
+from utils.resources import ResourceManager
 import scene
+import utils.config
+import utils.locale
 
 
 # Main App class, initializes game, runs main loops, handles events etc
 class App:
 	def __init__(self):
+		utils.config.init()
+		utils.locale.init()
 		self.graphics = Graphics()  # PyGame rendering/graphic utils
 		self.resource_manager = ResourceManager()
 		self.__running = True  # Flag determines if main loop should still run
@@ -32,8 +37,8 @@ class App:
 		self.__running = False  # Break main loop
 
 	# Function to change states, etc Intro -> Menu, Menu -> Game etc.
-	def switch_scene(self, new_scene: str, reload: bool=False):
-		self.scene_manager.go(new_scene, reload)
+	def switch_scene(self, new_scene: str, reload: bool=False, arg: Any=None):
+		self.scene_manager.go(new_scene, reload, arg)
 
 	# Methods and attributes which names start with __ (double underscore) are Private
 
@@ -60,4 +65,4 @@ class App:
 		self.scene_manager.current.destroy()
 		print("Game finished, closing")
 		pygame.quit()
-		quit()
+		sys.exit()

@@ -1,8 +1,7 @@
 
 Essence of the game
 
-Checkers is a two-player game with each player possessing 12 checkers, of either blue or red. The objective is to capture the opponent's checkers or
-immobilize them.
+Checkers is a two-player game with each player possessing 12 checkers, of either blue or red. The objective is to capture the opponent's checkers or immobilize them.
 
 
 The board
@@ -33,21 +32,15 @@ The King
 If a checker reaches the last rank on the board, either by a move or a jump, it becomes a king, and that completes the turn. A king can move, or jump, in any diagonal direction, 1 or more tiles per turn. A king can only jump over 1 checker at a time, to any empty tile behind it. Multiple jumps are applicable to kings too.
 
 
-
-Time restrictions
-
-1 turn can last for up to 2 and a half minutes, after which a player is forced to forfeit the game if either he has not done anything or did not finish a turn.
-
 Conditions of Ending
-
 
 Win
 
 The game is won, if: 
 
-The player has captured the opponent's checkers,
-The player has rendered the the opponent immobilized,
-The opponent has declared defeat
+ + The player has captured the opponent's checkers,
+ + The player has rendered the opponent immobilized,
+ + The opponent has declared defeat
 
 Loss
 

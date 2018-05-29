@@ -1,221 +1,24 @@
 import pygame
+
+from textmenu_override import CustomTextMenu
+import os
+from datetime import datetime
+from typing import List, Tuple
+
+
 import pygameMenu  # This imports classes and other things
 from pygameMenu.locals import *  # Import constants (like actions)
 
-from constants import *
+from utils.constants import *
 from scene import BaseScene
-from game import GameScene
-import pygame.gfxdraw as _gfxdraw
-import pygameMenu.config_textmenu as _cfg
-import pygameMenu.config_menu as _cfg_menu
-import math
 
+import utils.locale as i18n
+import utils.config as config
+from os import walk
+from utils.text import TextInput
 
 
 # Main Menu scene
-class supermenu(pygameMenu.TextMenu):
-	def __init__(self,
-				surface,
-				window_width,
-				window_height,
-				font,
-				title,
-				button_region_y=0,
-				draw_text_region_x=_cfg.TEXT_DRAW_X,
-				text_centered=_cfg.TEXT_CENTERED,
-				text_color=_cfg.TEXT_FONT_COLOR,
-				text_fontsize=20,
-				text_margin=_cfg.TEXT_MARGIN,
-				**kwargs):
-		super(supermenu, self).__init__(
-			surface,
-			window_width,
-			window_height,
-			font,
-			title,
-			draw_text_region_x,
-			text_centered,
-			text_color,
-			text_fontsize,
-			text_margin,
-			**kwargs)
-		self.pages_count = 0
-		self.actual_page = 0
-		text = self._actual._fonttext.render("A", 1, self._actual._font_textcolor)
-		text_width_char = text.get_size()[0]
-		text_height_char = self._actual._font_textsize
-		self.char_per_line = (self._width) // (text_width_char)
-		self.text_width_char = text_width_char
-		self.lines_per_page = (self._height - math.ceil(
-			self._actual._title_rect[4][1]) - 2 * text_margin - button_region_y) // (text_height_char)
-		self.button_region_y = button_region_y
-		self.default_title_str = title
-		self.set_title(
-			self.default_title_str + " Page: {actual_page}/{pages_count}".format(actual_page=self.actual_page + 1,
-																		pages_count=self.pages_count),
-			self._title_offsetx, self._title_offsety)
-
-	def draw(self):
-		assert isinstance(self._actual, supermenu)
-		# Draw background rectangle
-		_gfxdraw.filled_polygon(self._surface, self._actual._bgrect,
-		                        self._actual._bgcolor)
-		# Draw title
-		_gfxdraw.filled_polygon(self._surface, self._actual._title_rect,
-		                        self._bg_color_title)
-		self._surface.blit(self._actual._title, self._title_pos)
-		# Draw text
-		dy = 0
-		for linea in self._actual._text[
-		             self.actual_page * self.lines_per_page:(self.actual_page + 1) * self.lines_per_page]:
-			text = self._actual._fonttext.render(linea, 1,
-			                                     self._actual._font_textcolor)
-
-			ycoords = self._actual._title_rect[4][1] + self._actual._textdy + dy * (
-				self._actual._font_textsize)
-			self._surface.blit(text, (self._actual._pos_text_x,
-			                          ycoords))
-			dy += 1
-
-		dysum = 0.5 * self.lines_per_page * (self._actual._font_textsize)
-
-		if(self.actual_page>0):
-			instruction1 = "<- previous"
-			text = self._actual._fonttext.render(instruction1, 1,self._actual._font_textcolor)
-			self._surface.blit(text, (self._actual._pos_text_x + 40, ((self._height - (self.lines_per_page
-			        * self._actual._font_textsize + self._actual._title_rect[4][1]))/2) - self._actual._font_textsize
-			        + (self.lines_per_page * self._actual._font_textsize + self._actual._title_rect[4][1])))
-
-		if(self.actual_page<self.pages_count-1):
-			instruction2 = "next ->"
-			text = self._actual._fonttext.render(instruction2, 1,self._actual._font_textcolor)
-			self._surface.blit(text, (self._width-self._actual._pos_text_x - 40 - self.text_width_char
-			        * len(instruction2),((self._height- (self.lines_per_page
-			        * self._actual._font_textsize + self._actual._title_rect[4][1]))/2) - self._actual._font_textsize
-			        + (self.lines_per_page * self._actual._font_textsize + self._actual._title_rect[4][1])))
-
-		dy = 0
-		dy_index = 0
-		for option in self._actual._option:
-			# If option is selector
-			if option[0] == PYGAMEMENU_TYPE_SELECTOR:
-				# If selected index then change color
-				if dy == self._actual._index:
-					text = self._actual._font.render(option[1].get(), 1,
-					                                 self._actual._sel_color)
-					text_bg = self._actual._font.render(option[1].get(), 1,
-					                                    _cfg_menu.SHADOW_COLOR)
-				else:
-					text = self._actual._font.render(option[1].get(), 1,
-					                                 self._actual._font_color)
-					text_bg = self._actual._font.render(option[1].get(), 1,
-					                                    _cfg_menu.SHADOW_COLOR)
-			else:
-				# If selected index then change color
-				if dy == self._actual._index:
-					text = self._actual._font.render(option[0], 1,
-					                                 self._actual._sel_color)
-					text_bg = self._actual._font.render(option[0], 1,
-					                                    _cfg_menu.SHADOW_COLOR)
-				else:
-					text = self._actual._font.render(option[0], 1,
-					                                 self._actual._font_color)
-					text_bg = self._actual._font.render(option[0], 1,
-					                                    _cfg_menu.SHADOW_COLOR)
-			# Text font and size
-			text_width, text_height = text.get_size()
-			if self._actual._centered_option:
-				text_dx = -int(text_width / 2.0)
-				t_dy = -int(text_height / 2.0)
-			else:
-				text_dx = 0
-				t_dy = 0
-			# Draw fonts
-			if self._actual._option_shadow:
-				ycoords = self._actual._opt_posy + dy * (
-						self._actual._fsize + self._actual._opt_dy) + t_dy - 3
-				self._surface.blit(text_bg,
-				                   (self._actual._opt_posx + text_dx - 3,
-				                    ycoords + dysum))
-			ycoords = self._actual._opt_posy + dy * (
-					self._actual._fsize + self._actual._opt_dy) + t_dy
-			self._surface.blit(text, (self._actual._opt_posx + text_dx,
-			                          ycoords + dysum))
-			# If selected option draw a rectangle
-			if self._actual._drawselrect and (dy_index == self._actual._index):
-				if not self._actual._centered_option:
-					text_dx_tl = -text_width
-				else:
-					text_dx_tl = text_dx
-				ycoords = self._actual._opt_posy + dy * (
-						self._actual._fsize + self._actual._opt_dy) + t_dy - 2
-				pygame.draw.line(self._surface, self._actual._sel_color, (
-					self._actual._opt_posx + text_dx - 10,
-					self._actual._opt_posy + dysum + dy * (
-							self._actual._fsize + self._actual._opt_dy) + t_dy - 2),
-				                 ((self._actual._opt_posx - text_dx_tl + 10,
-				                   ycoords + dysum)), self._actual._rect_width)
-				ycoords = self._actual._opt_posy + dy * (
-						self._actual._fsize + self._actual._opt_dy) - t_dy + 2
-				pygame.draw.line(self._surface, self._actual._sel_color, (
-					self._actual._opt_posx + text_dx - 10,
-					self._actual._opt_posy + dysum + dy * (
-							self._actual._fsize + self._actual._opt_dy) - t_dy + 2),
-				                 ((self._actual._opt_posx - text_dx_tl + 10,
-				                   ycoords + dysum)), self._actual._rect_width)
-				ycoords = self._actual._opt_posy + dy * (
-						self._actual._fsize + self._opt_dy) - t_dy + 2
-				pygame.draw.line(self._surface, self._actual._sel_color, (
-					self._actual._opt_posx + text_dx - 10,
-					self._actual._opt_posy + dysum + dy * (
-							self._actual._fsize + self._actual._opt_dy) + t_dy - 2),
-				                 ((self._actual._opt_posx + text_dx - 10,
-				                   ycoords + dysum)), self._actual._rect_width)
-				ycoords = self._actual._opt_posy + dy * (
-						self._actual._fsize + self._actual._opt_dy) - t_dy + 2
-				pygame.draw.line(self._surface, self._actual._sel_color, (
-					self._actual._opt_posx - text_dx_tl + 10,
-					self._actual._opt_posy + dysum + dy * (
-							self._actual._fsize + self._actual._opt_dy) + t_dy - 2),
-				                 ((self._actual._opt_posx - text_dx_tl + 10,
-				                   ycoords + dysum)), self._actual._rect_width)
-			dy += 1
-			dy_index += 1
-
-	def add_line(self, text):
-		text = text.strip()
-		if len(text) > self.char_per_line:
-			sliced_text_1 = text[:self.char_per_line]
-			sliced_text_2 = text[self.char_per_line:]
-
-			if (sliced_text_1[-1].isalpha()):
-				sliced_text_2 = sliced_text_1[-1] + sliced_text_2
-				sliced_text_1 = sliced_text_1[:-1] + '-'
-			self._text.append(sliced_text_1)
-			self.add_line(sliced_text_2)
-		else:
-			self._text.append(text)
-		self.pages_count = math.ceil(len(self._text) / self.lines_per_page)
-		self.set_title(
-			self.default_title_str + " Page: {actual_page}/{pages_count}".format(actual_page=self.actual_page + 1,
-			                                                                     pages_count=self.pages_count),
-			self._title_offsetx, self._title_offsety)
-
-	def main1(self, events=None):
-		for event in events:
-			if event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT and self.actual_page > 0:
-				self.actual_page -= 1
-				self.set_title(self.default_title_str + " Page: {actual_page}/{pages_count}".format(
-					actual_page=self.actual_page + 1, pages_count=self.pages_count), self._title_offsetx,
-									self._title_offsety)
-
-			if event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT and self.actual_page < self.pages_count - 1:
-				self.actual_page += 1
-				self.set_title(self.default_title_str + " Page: {actual_page}/{pages_count}".format(
-					actual_page=self.actual_page + 1, pages_count=self.pages_count), self._title_offsetx,
-									self._title_offsety)
-
-
 class MenuScene(BaseScene):
 	def __init__(self, app):
 		super().__init__(app)
@@ -223,37 +26,244 @@ class MenuScene(BaseScene):
 		# Main Menu
 		self.menu = pygameMenu.Menu(app.graphics.screen, window_width=SCREEN_WIDTH, window_height=SCREEN_HEIGHT,
 									menu_width=SCREEN_WIDTH, menu_height=SCREEN_HEIGHT,
-									font=pygameMenu.fonts.FONT_NEVIS,
-									title='Main menu', bgfun=None, dopause=False)
+									font=FONT_MENU,
+									title=i18n.get('main_menu'), bgfun=None, dopause=False)
+
+		self.settings_menu = pygameMenu.Menu(app.graphics.screen, window_width=SCREEN_WIDTH, window_height=SCREEN_HEIGHT,
+		                            menu_width=SCREEN_WIDTH, menu_height=SCREEN_HEIGHT,
+		                            font=FONT_MENU,
+		                            title=i18n.get('settings'), bgfun=None, dopause=False)
+
+		self.settings_checkers_count_menu = pygameMenu.Menu(app.graphics.screen, window_width=SCREEN_WIDTH,
+		                                     window_height=SCREEN_HEIGHT,
+		                                     menu_width=SCREEN_WIDTH, menu_height=SCREEN_HEIGHT,
+		                                     font=FONT_MENU,
+		                                     title=i18n.get('checkers_count'), bgfun=None, dopause=False)
+
+		self.settings_sound_menu = pygameMenu.Menu(app.graphics.screen, window_width=SCREEN_WIDTH,
+		                                                    window_height=SCREEN_HEIGHT,
+		                                                    menu_width=SCREEN_WIDTH, menu_height=SCREEN_HEIGHT,
+		                                                    font=FONT_MENU,
+		                                                    title=i18n.get('sound'), bgfun=None, dopause=False)
+
+		self.settings_language_menu = pygameMenu.Menu(app.graphics.screen, window_width=SCREEN_WIDTH,
+		                                           window_height=SCREEN_HEIGHT,
+		                                           menu_width=SCREEN_WIDTH, menu_height=SCREEN_HEIGHT,
+		                                           font=FONT_MENU,
+		                                           title=i18n.get('language'), bgfun=None, dopause=False)
+
+		self.settings_players_names_menu = pygameMenu.Menu(app.graphics.screen, window_width=SCREEN_WIDTH,
+		                                              window_height=SCREEN_HEIGHT,
+		                                              menu_width=SCREEN_WIDTH, menu_height=SCREEN_HEIGHT,
+		                                              font=FONT_MENU,
+		                                              title=i18n.get('Players_Names'), bgfun=None, dopause=False)
+		self.settings_game_time_menu = pygameMenu.Menu(app.graphics.screen, window_width=SCREEN_WIDTH,
+		                                                   window_height=SCREEN_HEIGHT,
+		                                                   menu_width=SCREEN_WIDTH, menu_height=SCREEN_HEIGHT,
+		                                                   font=FONT_MENU,
+		                                                   title=i18n.get('game_time'), bgfun=None, dopause=False)
 
 		# Show the rules
-		self.help_menu = supermenu(app.graphics.screen, window_width=SCREEN_WIDTH, window_height=SCREEN_HEIGHT,
-									menu_width=SCREEN_WIDTH, menu_height=SCREEN_HEIGHT,
-									font=pygameMenu.fonts.FONT_FRANCHISE,
-									onclose=PYGAME_MENU_DISABLE_CLOSE,
-									title='Help', dopause=False,
-									menu_color_title=(120, 45, 30),
-									menu_color=(30, 50, 107),
-									button_region_y=50)
+		self.help_menu = CustomTextMenu(app.graphics.screen, window_width=SCREEN_WIDTH, window_height=SCREEN_HEIGHT,
+		                                menu_width=SCREEN_WIDTH, menu_height=SCREEN_HEIGHT,
+		                                font=FONT_TEXT,
+		                                font_title=FONT_MENU,
+		                                onclose=PYGAME_MENU_DISABLE_CLOSE,
+		                                title=i18n.get('rules_title'), dopause=False,
+		                                menu_color_title=(120, 45, 30),
+		                                menu_color=(30, 50, 107),
+		                                button_region_y=50)
 
-	def setup(self):
+		self.authors_menu = CustomTextMenu(app.graphics.screen, window_width=SCREEN_WIDTH, window_height=SCREEN_HEIGHT,
+		                                   menu_width=SCREEN_WIDTH, menu_height=SCREEN_HEIGHT,
+		                                   font=FONT_TEXT,
+		                                   font_title=FONT_MENU,
+		                                   onclose=PYGAME_MENU_DISABLE_CLOSE,
+		                                   text_centered = True,
+		                                   title=i18n.get('authors'), dopause=False,
+		                                   menu_color_title=(120, 45, 30),
+		                                   menu_color=(30, 50, 107),
+		                                   text_fontsize=40,
+		                                   button_region_y=50)
+
+		self.load_menu = pygameMenu.Menu(app.graphics.screen, window_width=SCREEN_WIDTH, window_height=SCREEN_HEIGHT,
+		                           menu_width=SCREEN_WIDTH, menu_height=SCREEN_HEIGHT,
+		                           font=FONT_TEXT,
+		                           menu_color_title=(120, 45, 30),
+		                           menu_color=(30, 50, 107),
+		                           title=i18n.get('load_game'), dopause=False)
+
+		self.init()
+
+	@staticmethod
+	def list_savegames() -> List[Tuple[str, str, str]]:
+		f = []
+		for (_, _, filenames) in walk(SAVE_PATH):
+			f.extend(filenames)
+			break
+
+		saves = []
+		for filename in f:
+			parts = filename.split('_')
+			parts[-1] = parts[-1].split('.')[0]
+			parts.append(filename)
+			saves.append(tuple(parts[1:]))
+
+		return saves
+
+	def prepare_load_menu(self):
+		save_list = self.list_savegames()
+		for save in save_list[-7:]:
+			timestamp = float(save[2])
+			dt = datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S')
+			title = "{} vs {}, {}".format(save[0], save[1], dt)
+			self.load_menu.add_option(title, self.__go_play, save[-1])
+
+		self.load_menu.add_option(i18n.get('return_to_menu'), PYGAME_MENU_BACK)
+
+	def init(self):
 		self.app.graphics.clear_screen()
 
-		self.menu.add_option('Play', self.__go_play)  # Add timer submenu
-		self.menu.add_option('Rules', self.help_menu)
-		self.menu.add_option('Exit', self.app.exit)  # Add exit function
+		sound_opts = [(i18n.get('on'), 'yes'),  # 0th option
+		              (i18n.get('off'), 'no')]  # 1st option
+		# if sounds is yes, default option is 0th, else 1st
+		default_sound = 0 if config.get('general', 'sounds').lower() == 'yes' else 1
 
-		HELP = open("resources/rules.txt", "r")
+		checkers_count_opts = [(i18n.get('2_rows'), '2'),
+		                       (i18n.get('3_rows'), '3')]
+		default_rows = 0 if config.get('general', 'startpiecerows') == '2' else 1
 
-		for line in HELP:
+		lang_opts = [('English', 'english'),
+		              ('Polski', 'polish')]
+		default_lang = 0 if config.get('general', 'locale').lower() == 'english' else 1
+
+		self.menu.add_option(i18n.get('new_game'), self.__go_play)  # Add timer submenu
+		self.menu.add_option(i18n.get('load_game'), self.load_menu)
+		self.menu.add_option(i18n.get('rules'), self.help_menu)
+		self.menu.add_option(i18n.get('settings'), self.settings_menu_in)
+		self.menu.add_option(i18n.get('authors'), self.authors_menu)
+		self.menu.add_option(i18n.get('exit'), self.app.exit)  # Add exit function
+
+		self.settings_menu.add_selector(i18n.get('checkers_count'), checkers_count_opts,
+		                                onreturn=None, onchange=self.__change_checkers_rows, default=default_rows)
+		self.settings_menu.add_selector(i18n.get('sound'), sound_opts,
+		                                onreturn=None, onchange=self.__change_sound, default=default_sound)
+		self.settings_menu.add_selector(i18n.get('language'), lang_opts,
+		                                onreturn=self.__change_lang, onchange=None, default=default_lang)
+
+		self.settings_menu.add_option(i18n.get('Players_Names'), self.settings_players_names_menu)
+		self.settings_menu.add_option(i18n.get('return_to_menu'), self.settings_menu_out)
+		self.settings_menu.disable()
+
+		self.settings_players_names_menu.add_option(i18n.get('BLUE'), self.__change_player, BLUE)
+		self.settings_players_names_menu.add_option(i18n.get('RED'), self.__change_player, RED)
+		self.settings_players_names_menu.add_option(i18n.get('return_to_menu'), PYGAME_MENU_BACK)
+
+
+		self.prepare_load_menu()
+
+		rules_path = RESOURCE_PATH + os.sep + i18n.get('rules_filename')
+		help_file = open(rules_path, "r",encoding='utf-8')
+
+		for line in help_file:
 			self.help_menu.add_line(line)  # Add line
-		self.help_menu.add_option('Return to Menu', PYGAME_MENU_BACK)  # Add option
+		self.help_menu.add_option(i18n.get('return_to_menu'), PYGAME_MENU_BACK)  # Add option
 
-		HELP.close()
+		help_file.close()
+
+		authors_path = RESOURCE_PATH + os.sep + i18n.get('authors_filename')
+		authors_file = open(authors_path, "r",encoding='utf-8')
+
+		for line in authors_file:
+			self.authors_menu.add_line(line)  # Add line
+		self.authors_menu.add_option(i18n.get('return_to_menu'), PYGAME_MENU_BACK)  # Add option
+
+		authors_file.close()
 
 	def update(self, events):
-		self.menu.mainloop(events)
-		self.help_menu.main1(events)
+		self.app.graphics.clear_screen()
+		if self.menu.is_enabled():
+			self.menu.mainloop(events)
+			self.help_menu.main1(events)
+		elif self.settings_menu.is_enabled():
+			self.settings_menu.mainloop(events)
 
-	def __go_play(self):
-		self.app.switch_scene(GAME, True)
+	def settings_menu_in(self):
+		self.menu.disable()
+		self.settings_menu.enable()
+
+	def settings_menu_out(self):
+		self.menu.enable()
+		self.settings_menu.disable()
+
+	def __go_play(self, load_filename=None):
+		self.app.switch_scene(GAME, True, load_filename)
+
+	def __change_player(self, color):
+		name_opt = 'blue_name' if color == BLUE else 'red_name'
+		player_name = config.get('general', name_opt)
+		scene = PlayerNamesScene(self.app, player_name, color)
+		self.app.scene_manager.go_once(scene)
+
+	@staticmethod
+	def __change_sound(opt):
+		cfg = config.get('general')
+		cfg['sounds'] = opt
+		config.save()
+
+	def __change_lang(self, opt):
+		i18n.switch_language(opt)
+		config.save()
+		self.app.switch_scene(MENU, True)
+
+	@staticmethod
+	def __change_checkers_rows(opt):
+		cfg = config.get('general')
+		cfg['startpiecerows'] = opt
+		config.save()
+
+
+class PlayerNamesScene(BaseScene):
+	def __init__(self, app, name, color):
+		super().__init__(app)
+		self.nameString = name
+		self.color = color
+		self.textInput = TextInput(default_text=name, text_color=color, font_family="comicsansms", cursor_color=color)
+
+		font = pygame.font.SysFont("tahoma", 32)
+		self._text = font.render(i18n.get('name_change'), True, WHITE)
+		font = pygame.font.SysFont("tahoma", 20)
+		self._hint = font.render(i18n.get('name_hint'), True, WHITE)
+
+	def update(self, events):
+
+		text_x = SCREEN_WIDTH / 2 - self._text.get_width() // 2
+		hint_x = SCREEN_WIDTH / 2 - self._hint.get_width() // 2
+		hint_y = SCREEN_HEIGHT - self._hint.get_height() - 2
+
+		self.app.graphics.clear_screen()
+		self.app.graphics.draw(self._text, (text_x, 10))
+		self.app.graphics.draw(self._hint, (hint_x, hint_y))
+
+		for event in events:
+			if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+				self.save()
+				return
+			if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+				self.back()
+				return
+
+		self.textInput.update(events)
+		text_surf: pygame.Surface = self.textInput.get_surface()
+		text_x = SCREEN_WIDTH / 2 - text_surf.get_width() // 2
+		self.app.graphics.draw(text_surf, (text_x, 50))
+
+	def save(self):
+		name_opt = 'blue_name' if self.color == BLUE else 'red_name'
+		cfg = config.get('general')
+		cfg[name_opt] = self.textInput.get_text()
+		config.save()
+		self.app.switch_scene(MENU, False)
+
+	def back(self):
+		self.app.switch_scene(MENU, False)
