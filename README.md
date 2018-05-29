@@ -1,7 +1,7 @@
 # INPG Checkers [![Build Status](https://travis-ci.org/barthap/inpg-checkers.svg?branch=master)](https://travis-ci.org/barthap/inpg-checkers)
 A simple checkers game project for INPG (IT tools for team work)
 
-## Installation:
+## Dependencies:
 Project uses following dependencies
 1. **Python 3.6**: To install Python, download it from here: https://www.python.org/downloads/ 
 2. **[PyGame](https://www.pygame.org/news)** - a library which make creating games with Python much easier. Install it with pip (Python package manager):
@@ -9,6 +9,8 @@ Project uses following dependencies
 3. **pygameMenu** - helper library for easy menu creation for pyGame. It's not available on pip
 so you have to download it from [GitHub](https://github.com/ppizarror/pygame-menu), unrar and open cmd/terminal at its location (where setup.py is) and type 
 `python setup.py install`
+4. **[Pygame Text Input](https://github.com/Nearoo/pygame-text-input)**: A small module allowing
+user to type player name. It is embedded into project in `src/utils/text.py`.
 
 If you have all needed dependencies, clone the repo
 ```
