@@ -18,7 +18,7 @@ class LocaleTests(unittest.TestCase):
 		i18n.init()
 
 		with self.assertRaises(KeyError):
-			i18n.get('play')
+			i18n.get('RED')
 
 	def test_keyDoesNotExist(self):
 		with self.assertRaises(KeyError):
@@ -30,4 +30,4 @@ class LocaleTests(unittest.TestCase):
 		setts['locale'] = 'english'
 		i18n.init()
 
-		self.assertEqual(i18n.get('play'), 'Play')
+		self.assertEqual(i18n.get('main_menu'), 'Main Menu')

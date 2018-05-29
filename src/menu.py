@@ -93,6 +93,10 @@ class MenuScene(BaseScene):
 		                           menu_color=(30, 50, 107),
 		                           title=i18n.get('load_game'), dopause=False)
 
+
+		version_font = pygame.font.SysFont("tahoma", 20)
+		self._version_text = version_font.render(APP_VERSION, True, (128, 128, 128))
+
 		self.init()
 
 	@staticmethod
@@ -163,7 +167,7 @@ class MenuScene(BaseScene):
 		self.prepare_load_menu()
 
 		rules_path = RESOURCE_PATH + os.sep + i18n.get('rules_filename')
-		help_file = open(rules_path, "r",encoding='utf-8')
+		help_file = open(rules_path, "r", encoding='utf-8')
 
 		for line in help_file:
 			self.help_menu.add_line(line)  # Add line
@@ -172,7 +176,7 @@ class MenuScene(BaseScene):
 		help_file.close()
 
 		authors_path = RESOURCE_PATH + os.sep + i18n.get('authors_filename')
-		authors_file = open(authors_path, "r",encoding='utf-8')
+		authors_file = open(authors_path, "r", encoding='utf-8')
 
 		for line in authors_file:
 			self.authors_menu.add_line(line)  # Add line
@@ -184,6 +188,7 @@ class MenuScene(BaseScene):
 		self.app.graphics.clear_screen()
 		if self.menu.is_enabled():
 			self.menu.mainloop(events)
+			self.app.graphics.draw(self._version_text, (5, SCREEN_HEIGHT - self._version_text.get_height() - 5))
 			self.help_menu.main1(events)
 		elif self.settings_menu.is_enabled():
 			self.settings_menu.mainloop(events)

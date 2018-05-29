@@ -19,7 +19,8 @@ git clone https://github.com/barthap/inpg-checkers.git
 
 #### 1. Running from executable
 
-Go to the downloads page and download latest release version
+Go to the [latest relase page](https://github.com/barthap/inpg-checkers/releases) and download binaries,
+then unrar the file and run `checkers.exe`
 
 #### 2. Running from python interpreter
 
