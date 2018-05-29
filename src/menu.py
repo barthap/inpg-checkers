@@ -1,6 +1,6 @@
 import pygame
 
-from textmenu_override import supermenu
+from textmenu_override import CustomTextMenu
 import os
 from datetime import datetime
 from typing import List, Tuple
@@ -15,15 +15,10 @@ from scene import BaseScene
 import utils.locale as i18n
 import utils.config as config
 from os import walk
-from utils.constants import SAVE_PATH
+from utils.text import TextInput
 
 
 # Main Menu scene
-from utils.text import TextInput
-
-__actualpath = str(os.path.abspath(
-    os.path.dirname(__file__))).replace('\\', '/')
-__fontdir = '{0}/fonts/{1}.ttf'
 class MenuScene(BaseScene):
 	def __init__(self, app):
 		super().__init__(app)
@@ -34,7 +29,7 @@ class MenuScene(BaseScene):
 									font=FONT_MENU,
 									title=i18n.get('main_menu'), bgfun=None, dopause=False)
 
-		self.settings_menu= pygameMenu.Menu(app.graphics.screen, window_width=SCREEN_WIDTH, window_height=SCREEN_HEIGHT,
+		self.settings_menu = pygameMenu.Menu(app.graphics.screen, window_width=SCREEN_WIDTH, window_height=SCREEN_HEIGHT,
 		                            menu_width=SCREEN_WIDTH, menu_height=SCREEN_HEIGHT,
 		                            font=FONT_MENU,
 		                            title=i18n.get('settings'), bgfun=None, dopause=False)
@@ -69,27 +64,27 @@ class MenuScene(BaseScene):
 		                                                   title=i18n.get('game_time'), bgfun=None, dopause=False)
 
 		# Show the rules
-		self.help_menu = supermenu(app.graphics.screen, window_width=SCREEN_WIDTH, window_height=SCREEN_HEIGHT,
-									menu_width=SCREEN_WIDTH, menu_height=SCREEN_HEIGHT,
-									font=FONT_TEXT,
-                                    font_title=FONT_MENU,
-									onclose=PYGAME_MENU_DISABLE_CLOSE,
-									title=i18n.get('rules_title'), dopause=False,
-									menu_color_title=(120, 45, 30),
-									menu_color=(30, 50, 107),
-									button_region_y=50)
+		self.help_menu = CustomTextMenu(app.graphics.screen, window_width=SCREEN_WIDTH, window_height=SCREEN_HEIGHT,
+		                                menu_width=SCREEN_WIDTH, menu_height=SCREEN_HEIGHT,
+		                                font=FONT_TEXT,
+		                                font_title=FONT_MENU,
+		                                onclose=PYGAME_MENU_DISABLE_CLOSE,
+		                                title=i18n.get('rules_title'), dopause=False,
+		                                menu_color_title=(120, 45, 30),
+		                                menu_color=(30, 50, 107),
+		                                button_region_y=50)
 
-		self.authors_menu = supermenu(app.graphics.screen, window_width=SCREEN_WIDTH, window_height=SCREEN_HEIGHT,
-		                           menu_width=SCREEN_WIDTH, menu_height=SCREEN_HEIGHT,
-		                           font=FONT_TEXT,
-		                           font_title=FONT_MENU,
-		                           onclose=PYGAME_MENU_DISABLE_CLOSE,
-                                   text_centered = True,
-		                           title=i18n.get('authors'), dopause=False,
-		                           menu_color_title=(120, 45, 30),
-		                           menu_color=(30, 50, 107),
-		                           text_fontsize=40,
-		                           button_region_y=50)
+		self.authors_menu = CustomTextMenu(app.graphics.screen, window_width=SCREEN_WIDTH, window_height=SCREEN_HEIGHT,
+		                                   menu_width=SCREEN_WIDTH, menu_height=SCREEN_HEIGHT,
+		                                   font=FONT_TEXT,
+		                                   font_title=FONT_MENU,
+		                                   onclose=PYGAME_MENU_DISABLE_CLOSE,
+		                                   text_centered = True,
+		                                   title=i18n.get('authors'), dopause=False,
+		                                   menu_color_title=(120, 45, 30),
+		                                   menu_color=(30, 50, 107),
+		                                   text_fontsize=40,
+		                                   button_region_y=50)
 
 		self.load_menu = pygameMenu.Menu(app.graphics.screen, window_width=SCREEN_WIDTH, window_height=SCREEN_HEIGHT,
 		                           menu_width=SCREEN_WIDTH, menu_height=SCREEN_HEIGHT,
@@ -140,9 +135,7 @@ class MenuScene(BaseScene):
 
 		lang_opts = [('English', 'english'),
 		              ('Polski', 'polish')]
-
 		default_lang = 0 if config.get('general', 'locale').lower() == 'english' else 1
-
 
 		self.menu.add_option(i18n.get('new_game'), self.__go_play)  # Add timer submenu
 		self.menu.add_option(i18n.get('load_game'), self.load_menu)
@@ -158,35 +151,34 @@ class MenuScene(BaseScene):
 		self.settings_menu.add_selector(i18n.get('language'), lang_opts,
 		                                onreturn=self.__change_lang, onchange=None, default=default_lang)
 
-
 		self.settings_menu.add_option(i18n.get('Players_Names'), self.settings_players_names_menu)
 		self.settings_menu.add_option(i18n.get('return_to_menu'), self.settings_menu_out)
 		self.settings_menu.disable()
 
-		self.settings_players_names_menu.add_option('BLUE', self.__change_player, BLUE)
-		self.settings_players_names_menu.add_option('RED', self.__change_player, RED)
+		self.settings_players_names_menu.add_option(i18n.get('BLUE'), self.__change_player, BLUE)
+		self.settings_players_names_menu.add_option(i18n.get('RED'), self.__change_player, RED)
 		self.settings_players_names_menu.add_option(i18n.get('return_to_menu'), PYGAME_MENU_BACK)
 
 
 		self.prepare_load_menu()
 
 		rules_path = RESOURCE_PATH + os.sep + i18n.get('rules_filename')
-		HELP = open(rules_path, "r",encoding='utf-8')
+		help_file = open(rules_path, "r",encoding='utf-8')
 
-		for line in HELP:
+		for line in help_file:
 			self.help_menu.add_line(line)  # Add line
 		self.help_menu.add_option(i18n.get('return_to_menu'), PYGAME_MENU_BACK)  # Add option
 
-		HELP.close()
+		help_file.close()
 
 		authors_path = RESOURCE_PATH + os.sep + i18n.get('authors_filename')
-		AUTHORS = open(authors_path, "r",encoding='utf-8')
+		authors_file = open(authors_path, "r",encoding='utf-8')
 
-		for line in AUTHORS:
+		for line in authors_file:
 			self.authors_menu.add_line(line)  # Add line
 		self.authors_menu.add_option(i18n.get('return_to_menu'), PYGAME_MENU_BACK)  # Add option
 
-		AUTHORS.close()
+		authors_file.close()
 
 	def update(self, events):
 		self.app.graphics.clear_screen()
@@ -224,7 +216,6 @@ class MenuScene(BaseScene):
 		config.save()
 		self.app.switch_scene(MENU, True)
 
-
 	@staticmethod
 	def __change_checkers_rows(opt):
 		cfg = config.get('general')
@@ -239,13 +230,20 @@ class PlayerNamesScene(BaseScene):
 		self.color = color
 		self.textInput = TextInput(default_text=name, text_color=color, font_family="comicsansms", cursor_color=color)
 
-	def update(self, events):
 		font = pygame.font.SysFont("tahoma", 32)
-		text = font.render('Enter player name', True, WHITE)    # TODO: ADD TRANSLATION HERE!
-		text_x = SCREEN_WIDTH/2 - text.get_width() //2
+		self._text = font.render(i18n.get('name_change'), True, WHITE)
+		font = pygame.font.SysFont("tahoma", 20)
+		self._hint = font.render(i18n.get('name_hint'), True, WHITE)
+
+	def update(self, events):
+
+		text_x = SCREEN_WIDTH / 2 - self._text.get_width() // 2
+		hint_x = SCREEN_WIDTH / 2 - self._hint.get_width() // 2
+		hint_y = SCREEN_HEIGHT - self._hint.get_height() - 2
 
 		self.app.graphics.clear_screen()
-		self.app.graphics.draw(text, (text_x, 10))
+		self.app.graphics.draw(self._text, (text_x, 10))
+		self.app.graphics.draw(self._hint, (hint_x, hint_y))
 
 		for event in events:
 			if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:

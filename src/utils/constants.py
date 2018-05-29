@@ -51,4 +51,4 @@ __fontdir = "{0}/{1}.ttf"
 FONT_TEXT = __fontdir.format("resources/fonts", 'Slabo27px-Regular')
 FONT_MENU = __fontdir.format("resources/fonts", 'Raleway-ExtraBold')
 
-LOREM_IPSUM="Go home Textmenu, You`re drunk."
+LOREM_IPSUM = "Go home Textmenu, You`re drunk."

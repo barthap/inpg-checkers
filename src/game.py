@@ -9,7 +9,6 @@ from time import time
 
 import pygame
 
-from endgame import EndGameScene
 from utils.resources import ResourceManager
 from scene import BaseScene
 from utils.constants import *
@@ -17,15 +16,14 @@ from graphics import Graphics
 from typing import Tuple, List, Set
 import utils.config as cfg
 import utils.locale as i18n
+from utils.time import GameTimer
+
 
 # Type definitions
 Coords = Tuple[int, int]
 Color = Tuple[int, int, int]
 SquareMatrix = List[List['Square']]
 GameInfo = namedtuple('GameInfo', ['turn', 'time', 'start_msg'])
-
-num_piece_rows = int(cfg.get('GENERAL', 'StartPieceRows'))
-sounds = cfg.get('general').getboolean('sounds')
 
 TEXT_X = BOARD_SIZE + 20
 x_center = lambda t: BOARD_SIZE + 200 / 2 - t.get_width() // 2
@@ -35,6 +33,8 @@ BEGIN_MESSAGE_DURATION = 3  # in seconds
 # it is later read from config / loaded savegame
 blue_name = 'BLUE'
 red_name = 'RED'
+num_piece_rows = 3
+sounds = False
 
 
 # Main Game code
@@ -49,9 +49,11 @@ class GameScene(BaseScene):
 		self.begin_msg = True
 		self.game_ended = False
 
-		global blue_name, red_name
+		global blue_name, red_name, num_piece_rows, sounds
 		blue_name = cfg.get('general', 'blue_name')
 		red_name = cfg.get('general', 'red_name')
+		num_piece_rows = int(cfg.get('GENERAL', 'StartPieceRows'))
+		sounds = cfg.get('general').getboolean('sounds')
 
 		# Randomly select first turn
 		self.turn: Color = BLUE if bool(random.getrandbits(1)) else RED
@@ -59,7 +61,7 @@ class GameScene(BaseScene):
 		if load_name is not None:
 			self.load_game(load_name)
 
-	def save_game(self):
+	def save_game(self) -> None:
 		print("Saving game...")
 		game_state = {
 			"board": self.board,
@@ -82,7 +84,7 @@ class GameScene(BaseScene):
 			pickle.dump(game_state, file, protocol=pickle.HIGHEST_PROTOCOL)
 			print("Saved!")
 
-	def load_game(self, filename):
+	def load_game(self, filename: str) -> None:
 		global blue_name, red_name
 		print("Loading game...")
 		self.deselect_piece()
@@ -98,7 +100,7 @@ class GameScene(BaseScene):
 			self.board = deepcopy(board)
 			print("Game loaded successfully")
 
-	def select_piece(self):
+	def select_piece(self) -> None:
 		mouse_square: Square = self.mouse_in_what_square()  # just make a variable once
 		if mouse_square is not None and mouse_square.piece is not None and mouse_square.piece.color == self.turn:
 			# Somebody else can hop but not me:
@@ -109,7 +111,7 @@ class GameScene(BaseScene):
 			else:
 				self.update_selected(mouse_square)
 
-	def update_selected(self, new_square: 'Square'):
+	def update_selected(self, new_square: 'Square') -> None:
 		self.selected_square = new_square
 		self.selected_square.highlighted = True
 		print("selected", self.selected_square.location)
@@ -126,12 +128,12 @@ class GameScene(BaseScene):
 				self.resource_manager.get_sound('err2.wav').play()
 			self.deselect_piece()
 
-	def deselect_piece(self):
+	def deselect_piece(self) -> None:
 		self.board.remove_all_highlights()
 		self.selected_square = None
 		print("unselected")
 
-	def move_piece(self):
+	def move_piece(self) -> None:
 		mouse_square = self.mouse_in_what_square()
 		if self.selected_square is not None:
 			if mouse_square == self.selected_square:
@@ -177,7 +179,7 @@ class GameScene(BaseScene):
 			return len(self.board.hop_possible_squares(location)) > 0
 
 	# Can anyone hop in this turn
-	def can_anyone_hop(self):
+	def can_anyone_hop(self) -> bool:
 		for (x, y) in Board.all_board_coords():
 			sq = self.board[(x, y)]
 			if sq.piece is not None and sq.piece.color == self.turn:
@@ -223,7 +225,7 @@ class GameScene(BaseScene):
 		# Not yet end game
 		return False, None
 
-	def switch_turn(self):
+	def switch_turn(self) -> None:
 		end_game, winner = self.is_end_game()
 		if end_game is True:
 			self.game_ended = True
@@ -255,7 +257,7 @@ class GameScene(BaseScene):
 	def setup(self):
 		pass
 
-	def update(self, events):
+	def update(self, events) -> None:
 		pressed = pygame.key.get_pressed()
 
 		alt_held = pressed[pygame.K_LALT] or pressed[pygame.K_RALT]
@@ -366,12 +368,12 @@ class GameRenderer:
 		if info.start_msg is True:
 			player_name = blue_name if info.turn == BLUE else red_name
 			msg_text = self.message_font.render(i18n.get('start_msg').format(player_name), True, info.turn)
-			pos_x = BOARD_SIZE/2 - msg_text.get_width()//2
-			pos_y = BOARD_SIZE/2 - msg_text.get_height()//2
+			pos_x = BOARD_SIZE / 2 - msg_text.get_width() // 2
+			pos_y = BOARD_SIZE / 2 - msg_text.get_height() // 2
 			self.graphics.draw(msg_text, (pos_x, pos_y))
 
 	def draw_sidebar_info(self, info: GameInfo):
-		turn_name = "BLUE" if info.turn == BLUE else "RED"
+		turn_name = i18n.get('BLUE') if info.turn == BLUE else i18n.get('RED')
 		current_turn_text = self.side_font.render(turn_name, True, info.turn)
 
 		secs = info.time % 60
@@ -394,11 +396,11 @@ class GameRenderer:
 
 		if info.turn == BLUE:
 			pass
-			cy = blue_y + self.small_blue.get_height()//2
+			cy = blue_y + self.small_blue.get_height() // 2
 		else:
 			cy = red_y + self.small_red.get_height() // 2
 
-		pygame.draw.circle(self.graphics.screen, YELLOW, (TEXT_X+self.small_red.get_width()//2, cy),
+		pygame.draw.circle(self.graphics.screen, YELLOW, (TEXT_X + self.small_red.get_width() // 2, cy),
 		                   self.small_red.get_width() // 2 + 5, 5)
 
 		self.graphics.draw(self.small_blue, (TEXT_X, blue_y))
@@ -708,27 +710,3 @@ class Piece:
 
 	def __str__(self):
 		return ("RED " if self.color == BLACK else "BLUE ") + ("King" if self.king else "Piece")
-
-
-class GameTimer:
-	def __init__(self, start_offset=0):
-		self.start_time = pygame.time.get_ticks() // 1000 - start_offset
-		self.current_time = 0
-		self.paused_time = 0
-		self.is_paused = False
-
-	def restart(self, offset=0):
-		self.start_time = pygame.time.get_ticks() // 1000 - offset
-		self.paused_time = 0
-
-	def pause(self):
-		self.paused_time = self.current_time
-		self.is_paused = True
-
-	def resume(self):
-		self.paused_time = pygame.time.get_ticks() // 1000 - self.paused_time
-		self.is_paused = False
-
-	def get(self):
-		self.current_time = pygame.time.get_ticks() // 1000 - self.start_time - self.paused_time
-		return self.current_time

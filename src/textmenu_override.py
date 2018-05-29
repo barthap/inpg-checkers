@@ -8,7 +8,8 @@ from pygameMenu.locals import *  # Import constants (like actions)
 from utils.constants import *  # Import constants (like actions)
 import utils.locale as i18n
 
-class supermenu(pygameMenu.TextMenu):
+
+class CustomTextMenu(pygameMenu.TextMenu):
 	def __init__(self,
 				surface,
 				window_width,
@@ -22,7 +23,7 @@ class supermenu(pygameMenu.TextMenu):
 				text_fontsize=20,
 				text_margin=_cfg.TEXT_MARGIN,
 				**kwargs):
-		super(supermenu, self).__init__(
+		super(CustomTextMenu, self).__init__(
 			surface,
 			window_width,
 			window_height,
@@ -36,7 +37,7 @@ class supermenu(pygameMenu.TextMenu):
 			**kwargs)
 		self.pages_count = 0
 		self.actual_page = 0
-		text = self._actual._fonttext.render(LOREM_IPSUM,1, self._actual._font_textcolor)
+		text = self._actual._fonttext.render(LOREM_IPSUM, 1, self._actual._font_textcolor)
 		text_width_char =math.ceil(text.get_size()[0]/len(LOREM_IPSUM))
 		#He is still drunk, but at least he is home
 		text_height_char = text.get_size()[1]
@@ -53,7 +54,7 @@ class supermenu(pygameMenu.TextMenu):
 			self._title_offsetx, self._title_offsety)
 
 	def draw(self):
-		assert isinstance(self._actual, supermenu)
+		assert isinstance(self._actual, CustomTextMenu)
 		# Draw background rectangle
 		_gfxdraw.filled_polygon(self._surface, self._actual._bgrect,
 		                        self._actual._bgcolor)
