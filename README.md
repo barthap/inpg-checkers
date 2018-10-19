@@ -1,6 +1,8 @@
 # INPG Checkers [![Build Status](https://travis-ci.org/barthap/inpg-checkers.svg?branch=master)](https://travis-ci.org/barthap/inpg-checkers)
 A simple checkers game project for INPG (IT tools for team work)
 
+![Game screenshots](docs/screenshots/scr1.png)
+
 ## Dependencies:
 Project uses following dependencies
 1. **Python 3.6**: To install Python, download it from here: https://www.python.org/downloads/ 
@@ -60,10 +62,15 @@ To make PyCharm resolve `import` statements correctly, you should also mark `src
 Click RMB on `src` folder, then _Mark Directory as -> Source root_.
 
 ## Authors
-- barthap (me)
+- Barthap (me)
 - [freestylofil](https://github.com/freestylofil)
 - [mizeria298](https://github.com/mizeria298)
 - [Ivurdaja](https://github.com/Ivurdaja)
+
+## Roadmap
+- Replace piece graphics
+- Add Player vs AI game mode with different difficulties
+- Add network multiplayer support
 
 ## Contribution
 This is a student project for teamwork learning purposes. If you

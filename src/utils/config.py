@@ -37,7 +37,7 @@ def get(group: str, prop: str=None) -> Any:
 	if prop is None:
 		return __cfg[group]
 
-	return __cfg[group][prop]
+	return __cfg[group][prop.lower()]
 
 
 def __create_default_cfg() -> cp.ConfigParser:
