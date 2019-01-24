@@ -42,7 +42,6 @@ class GameScene(BaseScene):
 		super().__init__(app)
 		self.renderer = GameRenderer(app.graphics)
 		self.resource_manager = ResourceManager()
-		self.board: Board = Board()
 		self.selected_square: Square = None  # Board square
 		self.timer = GameTimer()
 		self.begin_msg = True
@@ -53,6 +52,8 @@ class GameScene(BaseScene):
 		red_name = cfg.get('general', 'red_name')
 		num_piece_rows = int(cfg.get('GENERAL', 'StartPieceRows'))
 		sounds = cfg.get('general').getboolean('sounds')
+
+		self.board: Board = Board()
 
 		# Randomly select first turn
 		self.turn: Color = BLUE if bool(random.getrandbits(1)) else RED
