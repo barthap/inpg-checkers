@@ -266,6 +266,20 @@ class GameLogicTests(unittest.TestCase):
 		self.assertTrue(self.game.can_hop(tested_king_pos))
 		self.assertTrue(self.game.can_hop((2, 2)))
 
+	def test_legal_moves_after_king_possible(self):
+		pieces = [((0, 0), Piece(RED, False)),
+		          ((2, 0), Piece(BLUE, False)),
+		          ((0, 2), Piece(RED, False)),
+		          ((0, 6), Piece(RED, False))]
+		set_pieces(self.board, pieces)
+
+		print("King possible - end game test")
+		draw_ascii_board(self.board)
+
+		result, _ = self.game.is_end_game()
+
+		self.assertFalse(result)
+
 	def tearDown(self):
 		pass
 

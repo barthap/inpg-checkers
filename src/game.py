@@ -18,7 +18,6 @@ import utils.config as cfg
 import utils.locale as i18n
 from utils.time import GameTimer
 
-
 # Type definitions
 Coords = Tuple[int, int]
 Color = Tuple[int, int, int]
@@ -106,7 +105,7 @@ class GameScene(BaseScene):
 			# Somebody else can hop but not me:
 			if self.can_anyone_hop() and not self.can_hop(mouse_square.location):
 				print("Other piece can HOP!")
-				if sounds is True:
+				if sounds:
 					self.resource_manager.get_sound('err.wav').play()
 			else:
 				self.update_selected(mouse_square)
@@ -124,7 +123,7 @@ class GameScene(BaseScene):
 				self.board[location].highlighted = True
 		else:
 			print('no legal moves')
-			if sounds is True:
+			if sounds:
 				self.resource_manager.get_sound('err2.wav').play()
 			self.deselect_piece()
 
@@ -169,7 +168,7 @@ class GameScene(BaseScene):
 				return False
 			location = self.selected_square.location
 
-		if self.board[location].piece.king is False:
+		if not self.board[location].piece.king:
 			adj = self.board.adjacent_tiles(location)
 			for move in self.board.legal_moves(location):
 				if move not in adj:
@@ -189,6 +188,9 @@ class GameScene(BaseScene):
 
 	# Returns True if any piece with specified color can do a legal move
 	def can_anyone_move(self, turn: Color) -> bool:
+		if self.board.knight_possible():
+			return True
+
 		squares = list()
 
 		# Firstly get all squares with pieces matching turn color
@@ -240,7 +242,7 @@ class GameScene(BaseScene):
 			print("Current turn: " + ("RED" if self.turn == RED else "BLUE"))
 
 	def play_piece_sound(self, hop=False) -> None:
-		if sounds is False:
+		if not sounds:
 			return
 
 		if self.selected_square.piece.king is True:
@@ -264,7 +266,7 @@ class GameScene(BaseScene):
 		ctrl_held = pressed[pygame.K_LCTRL] or pressed[pygame.K_RCTRL]
 		for event in events:
 			if event.type == pygame.KEYDOWN and (event.key == pygame.K_SPACE or event.key == pygame.K_ESCAPE) \
-					and self.begin_msg is False:
+					and not self.begin_msg:
 				self.timer.pause()
 				self.app.switch_scene(PAUSE)
 				return
@@ -287,7 +289,7 @@ class GameScene(BaseScene):
 			self.timer.pause()
 			return
 
-		if self.timer.is_paused is True and self.begin_msg is False:
+		if self.timer.is_paused is True and not self.begin_msg:
 			self.timer.resume()
 
 		if self.begin_msg is True and self.timer.current_time >= BEGIN_MESSAGE_DURATION:
@@ -411,17 +413,16 @@ class GameRenderer:
 		self.graphics.draw(blue_player, (name_x, blue_y + height_center))
 		self.graphics.draw(red_player, (name_x, red_y + height_center))
 
-
 	def draw_board_pieces(self, board: 'Board') -> None:
 		for (x, y) in Board.all_board_coords():
 			if board[(x, y)].piece is not None:
-				if board[(x, y)].piece.color == RED and board[(x, y)].piece.king is False:
+				if board[(x, y)].piece.color == RED and not board[(x, y)].piece.king:
 					self.graphics.draw(self.red_piece, what_pixel((x, y)))
-				elif board[(x, y)].piece.color == RED and board[(x, y)].piece.king is True:
+				elif board[(x, y)].piece.color == RED and board[(x, y)].piece.king:
 					self.graphics.draw(self.red_king, what_pixel((x, y)))
-				elif board[(x, y)].piece.color == BLUE and board[(x, y)].piece.king is True:
+				elif board[(x, y)].piece.color == BLUE and board[(x, y)].piece.king:
 					self.graphics.draw(self.blue_king, what_pixel((x, y)))
-				elif board[(x, y)].piece.color == BLUE and board[(x, y)].piece.king is False:
+				elif board[(x, y)].piece.color == BLUE and not board[(x, y)].piece.king:
 					self.graphics.draw(self.blue_piece, what_pixel((x, y)))
 
 	def draw_highlighted_squares(self, board: 'Board', color=GREEN) -> None:
@@ -431,7 +432,7 @@ class GameRenderer:
 		for x in range(8):
 			for y in range(8):
 				pos = (x, y)
-				if board.get_square(pos).highlighted is True:
+				if board.get_square(pos).highlighted:
 					self.graphics.draw(rect_surface, what_pixel(pos))
 
 
@@ -600,7 +601,7 @@ class Board:
 					if self.is_on_board(se_dir) and self.get_square(se_dir).piece is None:
 						normal_legal_moves.append(se_dir)
 			# If king is True
-			if piece.king is True:
+			if piece.king:
 				normal_legal_moves.extend(self.king_move_tiles(coords))
 
 		return normal_legal_moves
@@ -625,7 +626,7 @@ class Board:
 					next_tile_has_piece = (next_tile_on_board and self.get_square(next_tile_pos).piece is not None)
 					if tile_pos != coords:  # moving nowhere is illegal
 						possible_squares.append(tile_pos)
-					if (next_tile_on_board is True and next_tile_has_piece is True) or \
+					if (next_tile_on_board and next_tile_has_piece) or \
 							(next_tile_on_board is False):
 						break
 		return possible_squares
@@ -636,7 +637,7 @@ class Board:
 		piece: Piece = self.matrix[x][y].piece
 
 		if piece is not None:
-			if piece.king is False:
+			if not piece.king:
 				for move in self.adjacent_tiles(coords):
 					if move is not None and self.is_on_board(move):
 						# If on adjacent tile there is an enemy
@@ -680,12 +681,12 @@ class Board:
 		for x in range(8):
 			for y in range(7, 8):
 				piece: Piece = self.matrix[x][y].piece
-				if piece is not None and piece.color == RED and piece.king is False:
+				if piece is not None and piece.color == RED and not piece.king:
 					piece.king = True
 					somebody_promoted = True
 			for y in range(1):
 				piece: Piece = self.matrix[x][y].piece
-				if piece is not None and piece.color == BLUE and piece.king is False:
+				if piece is not None and piece.color == BLUE and not piece.king:
 					piece.king = True
 					somebody_promoted = True
 		return somebody_promoted
@@ -700,7 +701,7 @@ class Square:
 
 	def __str__(self):
 		return ("BLACK " if self.color == BLACK else "WHITE ") + " Square at " + str(self.location) + ", " + \
-		       ("not " if self.highlighted is False else "") + "highlighted"
+		       ("not " if not self.highlighted else "") + "highlighted"
 
 
 class Piece:
